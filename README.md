@@ -1,6 +1,11 @@
 # showroom-recorder
 A Script for Recording Showroom Streaming Video
 
+- en [English](README.md)
+- zh_CN [简体中文](README.zh_CN.md)
+
+> Only test On Ubuntu-22.04-x86_64
+
 ## Installation
 
 Install requirements
@@ -27,4 +32,5 @@ And run the script directly:
 ```
 python3 download.py LOVE_MAIKA_SASAKI
 ```
+
 The script will recorder streaming video in the data directory (./save) 
