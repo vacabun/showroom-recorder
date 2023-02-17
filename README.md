@@ -4,7 +4,7 @@ A Script for Recording Showroom Streaming Video
 - en [English](README.md)
 - zh_CN [简体中文](README.zh_CN.md)
 
-> Only test On Ubuntu-22.04-x86_64
+> Only tested On Ubuntu-22.04-x86_64
 
 ## Installation
 
