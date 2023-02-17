@@ -13,6 +13,19 @@ url_header = "https://www.showroom-live.com/"
 
 name = "LOVE_MAIKA_SASAKI"
 
+def get_online(url):
+    room_url_key = match1(url, r'\w+://www.showroom-live.com/([-\w]+)')
+    room_id = showroom.showroom_get_roomid_by_room_url_key(room_url_key)
+    timestamp = str(int(time.time() * 1000))
+    api_endpoint = 'https://www.showroom-live.com/api/live/streaming_url?room_id={room_id}&_={timestamp}'.format(
+        room_id=room_id, timestamp=timestamp)
+    html = get_content(api_endpoint)
+    html = loads(html)
+    if len(html) >= 1:
+        return True
+    else:
+        return False
+    
 if __name__ == "__main__":
     if len(sys.argv) == 2:
         name = sys.argv[1]
@@ -32,15 +45,4 @@ if __name__ == "__main__":
         time.sleep(1)
 
 
-def get_online(url):
-    room_url_key = match1(url, r'\w+://www.showroom-live.com/([-\w]+)')
-    room_id = showroom.showroom_get_roomid_by_room_url_key(room_url_key)
-    timestamp = str(int(time.time() * 1000))
-    api_endpoint = 'https://www.showroom-live.com/api/live/streaming_url?room_id={room_id}&_={timestamp}'.format(
-        room_id=room_id, timestamp=timestamp)
-    html = get_content(api_endpoint)
-    html = loads(html)
-    if len(html) >= 1:
-        return True
-    else:
-        return False
+
