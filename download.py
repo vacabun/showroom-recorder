@@ -11,7 +11,7 @@ current_directory = os.path.dirname(os.path.abspath(__file__))
 
 url_header = "https://www.showroom-live.com/"
 
-name = "LOVE_MAIKA_SASAKI"
+name = "tps_122500"
 
 def get_online(url):
     room_url_key = match1(url, r'\w+://www.showroom-live.com/([-\w]+)')
