@@ -4,11 +4,15 @@ A Script for Recording Showroom Streaming Video
 - en [English](README.md)
 - zh_CN [简体中文](README.zh_CN.md)
 
-> Only tested On Ubuntu-22.04-x86_64
+> It is recommended to use it in the linux environment.
+
+> If you are the windows user. Please use `cygwin` or use on the `wsl (Windows Subsystem for Linux)`.
 
 ## Installation
 
-Install requirements
+1.Install the python3.
+
+2.Install requirements.
 
 ```
 pip install -r requirements.txt
