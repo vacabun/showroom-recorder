@@ -9,8 +9,9 @@
 > 如果你是`windows`用户。 请使用`cygwin`或在`wsl（适用于 Linux 的 Windows 子系统）`上使用。
 
 ## Installation
+1.安装python3。
 
-安装依赖
+2.安装依赖。
 
 ```
 pip install -r requirements.txt
