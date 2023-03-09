@@ -6,7 +6,7 @@
 
 > 推荐在`linux`环境下使用。
 
-> 如果你是windows用户。 请使用`cygwin`或在`wsl（适用于 Linux 的 Windows 子系统）`上使用。
+> 如果你是`windows`用户。 请使用`cygwin`或在`wsl（适用于 Linux 的 Windows 子系统）`上使用。
 
 ## Installation
 
