@@ -18,6 +18,12 @@ A Script for Recording Showroom Streaming Video
 pip install -r requirements.txt
 ```
 
+3.Install ffmpeg
+
+```
+sudo apt install ffmpeg
+```
+
 ## Usage
 
 The basic usage is to directly input the member room name as a parameter:
