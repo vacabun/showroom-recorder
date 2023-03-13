@@ -40,8 +40,8 @@ if __name__ == "__main__":
                 showroom.showroom_download(url, output_dir=dir)
             else:
                 logging.warning(name + "\'s live show is currently offline.")
-        except:
-            time.sleep(1)
+        except BaseException as e:
+            logging.error(e)
         time.sleep(1)
 
 
