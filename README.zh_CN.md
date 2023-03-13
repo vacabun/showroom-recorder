@@ -11,10 +11,16 @@
 ## Installation
 1.安装python3。
 
-2.安装依赖。
+2.安装python包。
 
 ```
-pip install -r requirements.txt
+sudo pip install -r requirements.txt
+```
+
+2.安装ffmpeg。
+
+```
+sudo apt install ffmpeg
 ```
 
 ## Usage
