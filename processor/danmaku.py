@@ -10,7 +10,7 @@ import logging.handlers
 
 from json import JSONDecodeError
 from argparse import ArgumentParser
-
+from utils import delete_emoji
 # requirements.txt
 import pytz
 import requests
@@ -718,6 +718,7 @@ class CommentRecorder:
                 assfp.write(assTxt)
             logging.info(self.room_url_key +
                          ': recording finished, saved to ' + _assfile)
+            delete_emoji.delete_emoji(_assfile)
 
         try:
             if self.save_comments_debug_log > 0:
