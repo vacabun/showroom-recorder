@@ -21,7 +21,7 @@ sudo apt install ffmpeg
 
 4.安装字体`font/msgothic.ttc`
 
-]
+
 ## Usage
 使用方法为直接将成员房间名作为参数运行脚本：
 

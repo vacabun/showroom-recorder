@@ -4,10 +4,6 @@ A Script for Recording Showroom Streaming Video
 - en [English](README.md)
 - zh_CN [简体中文](README.zh_CN.md)
 
-> It is recommended to use it in the `linux` or `macOS` environment.
-
-> If you are the `windows` user. Please use `cygwin` or use on the `wsl (Windows Subsystem for Linux)`.
-
 ## Installation
 
 1.Install the python3.
