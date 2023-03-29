@@ -7,7 +7,9 @@ from you_get.common import match1, get_content
 from json import loads
 from you_get.extractors import showroom
 
-current_directory = os.path.dirname(os.path.abspath(__file__))
+from utils import config
+
+os.chdir(os.path.dirname(__file__))
 
 url_header = "https://www.showroom-live.com/"
 
@@ -25,21 +27,25 @@ def get_online(url):
         return True
     else:
         return False
-    
+
+
+
 if __name__ == "__main__":
+
+    
     if len(sys.argv) == 2:
         name = sys.argv[1]
     while True:
         try:
             url = url_header + name
             if get_online(url):
-                logging.warning(name + "\'s live show is currently online.")
-                dir = current_directory + '/save/'+name + \
+                logging.info(name + "\'s live show is currently online.")
+                dir = 'videos/'+name + \
                     '_' + str(int(time.time() * 1000))
                 os.makedirs(dir)
                 showroom.showroom_download(url, output_dir=dir)
             else:
-                logging.warning(name + "\'s live show is currently offline.")
+                logging.info(name + "\'s live show is currently offline.")
         except BaseException as e:
             logging.error(e)
         time.sleep(1)
