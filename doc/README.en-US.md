@@ -1,9 +1,9 @@
 # showroom-recorder
 A Script for Recording Showroom Streaming Video
 
-[![zh_CN](https://img.shields.io/badge/lang-es-yellow.svg)](https://github.com/vacabun/showroom-recorder/blob/main/doc/README.zh_CN.md)
-[![en-US](https://img.shields.io/badge/lang-es-yellow.svg)](https://github.com/vacabun/showroom-recorder/blob/main/doc/README.en-US.md)
-[![jp-JP](https://img.shields.io/badge/lang-es-yellow.svg)](https://github.com/vacabun/showroom-recorder/blob/main/doc/README.jp-JP.md)
+[![zh_CN](https://img.shields.io/badge/language-zh__CN-green.svg)](https://github.com/vacabun/showroom-recorder/blob/main/doc/README.zh_CN.md)
+[![en-US](https://img.shields.io/badge/language-en--US-green.svg)](https://github.com/vacabun/showroom-recorder/blob/main/doc/README.en-US.md)
+[![jp-JP](https://img.shields.io/badge/language-jp--JP-green.svg)](https://github.com/vacabun/showroom-recorder/blob/main/doc/README.jp-JP.md)
 
 ## Installation
 
