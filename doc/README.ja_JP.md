@@ -2,9 +2,8 @@
 SHOWROOMビデオを録画するためのスクリプト
 
 [![zh_CN](https://img.shields.io/badge/language-zh__CN-green.svg)](https://github.com/vacabun/showroom-recorder/blob/main/doc/README.zh_CN.md)
-[![en-US](https://img.shields.io/badge/language-en--US-green.svg)](https://github.com/vacabun/showroom-recorder/blob/main/doc/README.en-US.md)
-[![jp-JP](https://img.shields.io/badge/language-jp--JP-green.svg)](https://github.com/vacabun/showroom-recorder/blob/main/doc/README.jp-JP.md)
-
+[![en_US](https://img.shields.io/badge/language-en__US-green.svg)](https://github.com/vacabun/showroom-recorder/blob/main/doc/README.en_US.md)
+[![ja_JP](https://img.shields.io/badge/language-ja__JP-green.svg)](https://github.com/vacabun/showroom-recorder/blob/main/doc/README.ja_JP.md)
 
 ## インストール方法
 1. python3をインストールしてください。
