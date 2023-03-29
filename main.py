@@ -11,8 +11,8 @@ os.chdir(os.path.dirname(__file__))
 
 
 if __name__ == "__main__":
-    room_url_keys = config.readRoomsFile('config/rooms.ini')
-    danmaku_settings = config.readSettingsFile('config/danmaku.ini')
+    room_url_keys = config.readRoomsFile('rooms.ini')
+    danmaku_settings = config.readSettingsFile('config.ini')
 
     # build logging
     log = logging.getLogger()

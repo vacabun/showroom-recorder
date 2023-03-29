@@ -24,23 +24,22 @@ pip install -r requirements.txt
 sudo apt install ffmpeg
 ```
 
+4.Install font `font/msgothic.ttc`.
+
 ## Usage
 
-The basic usage is to directly input the member room name as a parameter:
+Directly input the member room name as a parameter:
 
 ```
-python3 download.py LOVE_MAIKA_SASAKI
+python3 download.py -i LOVE_MAIKA_SASAKI
 ```
 
-Or modify the default member name in the script:
+Or modify the rooms.ini file. 
 
-```
-name = "LOVE_MAIKA_SASAKI"
-```
-And run the script directly:
+The configuration file will be automatically created on the first run.
 
-```
-python3 download.py LOVE_MAIKA_SASAKI
-```
+> The SHOWROOM live address is "https://www.showroom-live.com/ROOM_URL_KEY".
+> Please copy the last segment of the room name and paste it into the rooms.ini file.
+> Enter multiple room names separated by line breaks and use "#" for comments.
 
-The script will recorder streaming video in the data directory (./save) 
+The recorded video will be stored in the save folder, and the comments will be saved in the comments folder as subtitles.
