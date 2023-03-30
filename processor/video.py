@@ -31,7 +31,7 @@ def showroom_get_roomid_by_room_url_key(room_url_key):
     return roomid
 
 
-def showroom_download_by_room_id(room_id, output_dir='.', merge=False, info_only=False, **kwargs):
+def showroom_download_by_room_id(room_id, room_url_key, output_dir='.', merge=False, info_only=False, **kwargs):
     '''Source: Android mobile'''
     while True:
         timestamp = str(int(time.time() * 1000))
@@ -42,7 +42,7 @@ def showroom_download_by_room_id(room_id, output_dir='.', merge=False, info_only
         if len(html) >= 1:
             break
         logging.w('The live show is currently offline.')
-        sleep(1)
+        time.sleep(1)
 
     stream_url = [i['url'] for i in html['streaming_url_list']
                   if i['is_default'] and i['type'] == 'hls'][0]
@@ -58,8 +58,8 @@ def showroom_download_by_room_id(room_id, output_dir='.', merge=False, info_only
     # except KeyError:
     #     title = 'Showroom_{room_id}'.format(room_id = room_id)
     
-    title = 'Showroom_{room_id}_{time}'.format(
-        room_id=room_id, time=time.strftime("%Y_%m_%d_%X_%H_%M_%S", time.localtime()))
+    title = '{room_url_key}_{time}'.format(
+        room_url_key=room_url_key, time=time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime()))
     
     logging.info(title)
 
@@ -78,7 +78,7 @@ def showroom_download(url, output_dir='.', merge=False, info_only=False, **kwarg
     if re.match(r'(\w+)://www.showroom-live.com/([-\w]+)', url):
         room_url_key = match1(url, r'\w+://www.showroom-live.com/([-\w]+)')
         room_id = showroom_get_roomid_by_room_url_key(room_url_key)
-        showroom_download_by_room_id(room_id, output_dir, merge,
+        showroom_download_by_room_id(room_id, room_url_key, output_dir, merge,
                                      info_only)
 
 

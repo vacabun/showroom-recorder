@@ -679,7 +679,7 @@ class CommentRecorder:
         tokyo_timezone = pytz.timezone('Asia/Tokyo')
         dt = datetime.datetime.fromtimestamp(self.ws_startTime / 1000.0)
         dt_tokyo = dt.astimezone(tokyo_timezone)
-        time_string = dt_tokyo.strftime('%y%m%d %H%M%S')
+        time_string = dt_tokyo.strftime('%y_%m_%d_%H_%M_%S')
 
         # create subfolder 'comments'
         path = os.getcwd()
@@ -691,17 +691,18 @@ class CommentRecorder:
                 path = os.getcwd()
 
         # remove invalid file name characters \ / : * ? " < > |
-        invalidChar = ['\\', '/', ':', '*', '?', '"', '<', '>', '|']
+        invalidChar = ['\\', '/', ':', '*', '?', '"', '<', '>', '|', ' ', '（', '）']
         for c in invalidChar:
             self.room_name = self.room_name.replace(c, '_')
 
-        filename = os.path.join(
-            path, self.room_url_key + ' ' + time_string + ' ' + self.room_name)
+        # filename = os.path.join(
+        #     path, self.room_url_key + '_' + time_string + '_' + self.room_name)
+        filename = os.path.join(path, self.room_url_key + '_' + time_string)
         logfile = filename + '.log'
         assfile = filename + '.ass'
 
         # in case that room_name is still invalid
-        filename2 = os.path.join(path, self.room_url_key + ' ' + time_string)
+        filename2 = os.path.join(path, self.room_url_key + '_' + time_string)
         logfile2 = filename2 + '.log'
         assfile2 = filename2 + '.ass'
 
