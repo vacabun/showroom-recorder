@@ -136,12 +136,15 @@ class RoomMonitor:
 
                 if self.vRecords[i] is None:
                     room_url_key = self.room_url_keys[i]
+                    try:
+                        if get_online("https://www.showroom-live.com/"+room_url_key):
+                            vr = VideoRecorder(room_url_key, self.settings)
+                            vr.start()
+                            self.vRecords[i] = vr
+                            continue
+                    except BaseException as e:
+                        logging.error(e)
 
-                    if get_online("https://www.showroom-live.com/"+room_url_key):
-                        vr = VideoRecorder(room_url_key, self.settings)
-                        vr.start()
-                        self.vRecords[i] = vr
-                        continue
             time.sleep(1)
         # end while
 
