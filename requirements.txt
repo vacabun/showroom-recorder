@@ -1,5 +1,6 @@
-emoji==2.2.0
-pytz==2023.3
-requests==2.28.2
-websocket_client==1.5.1
-you_get==0.4.1650
+emoji
+pytz
+requests
+websocket_client
+you_get
+ffmpeg-python

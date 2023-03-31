@@ -6,9 +6,10 @@ import logging
 import threading
 import json
 import re
+import subprocess
+import ffmpeg
 
-from you_get.common import match1, get_content, url_info, print_info, download_url_ffmpeg
-
+from you_get.common import match1, get_content
 
 from utils import config
 
@@ -31,55 +32,49 @@ def showroom_get_roomid_by_room_url_key(room_url_key):
     return roomid
 
 
-def showroom_download_by_room_id(room_id, room_url_key, output_dir='.', merge=False, info_only=False, **kwargs):
-    '''Source: Android mobile'''
-    while True:
-        timestamp = str(int(time.time() * 1000))
-        api_endpoint = 'https://www.showroom-live.com/api/live/streaming_url?room_id={room_id}&_={timestamp}'.format(
-            room_id=room_id, timestamp=timestamp)
-        html = get_content(api_endpoint)
-        html = json.loads(html)
-        if len(html) >= 1:
-            break
-        logging.w('The live show is currently offline.')
-        time.sleep(1)
-
-    stream_url = [i['url'] for i in html['streaming_url_list']
-                  if i['is_default'] and i['type'] == 'hls'][0]
-
-    assert stream_url
-
-    # title
-    # title = ''
-    # profile_api = 'https://www.showroom-live.com/api/room/profile?room_id={room_id}'.format(room_id = room_id)
-    # html = json.loads(get_content(profile_api))
-    # try:
-    #     title = html['main_name']
-    # except KeyError:
-    #     title = 'Showroom_{room_id}'.format(room_id = room_id)
-    
-    title = '{room_url_key}_{time}'.format(
-        room_url_key=room_url_key, time=time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime()))
-    
-    logging.info(title)
-
-    if info_only:
-        type_, ext, size = url_info(stream_url)
-        print_info("showroom", title, type_, size)
-    if not info_only:
-        download_url_ffmpeg(url=stream_url, title=title,
-                            # params={'-v':  'quiet'},
-                            ext='mp4', output_dir=output_dir)
-
-
 # ----------------------------------------------------------------------
-def showroom_download(url, output_dir='.', merge=False, info_only=False, **kwargs):
-    """"""
+def showroom_download(url, output_dir='.'):
     if re.match(r'(\w+)://www.showroom-live.com/([-\w]+)', url):
         room_url_key = match1(url, r'\w+://www.showroom-live.com/([-\w]+)')
         room_id = showroom_get_roomid_by_room_url_key(room_url_key)
-        showroom_download_by_room_id(room_id, room_url_key, output_dir, merge,
-                                     info_only)
+        while True:
+            timestamp = str(int(time.time() * 1000))
+            api_endpoint = 'https://www.showroom-live.com/api/live/streaming_url?room_id={room_id}&_={timestamp}'.format(
+                room_id=room_id, timestamp=timestamp)
+            html = get_content(api_endpoint)
+            html = json.loads(html)
+            if len(html) >= 1:
+                break
+            logging.w('The live show is currently offline.')
+            time.sleep(1)
+
+        stream_url = [i['url'] for i in html['streaming_url_list']
+                      if i['is_default'] and i['type'] == 'hls'][0]
+
+        title = '{room_url_key}_{time}'.format(
+            room_url_key=room_url_key, time=time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime()))
+
+        output = output_dir + '/' + title + '.' + 'mp4'
+
+        try:
+            proc = (
+                ffmpeg
+                .input(stream_url)
+                .output(output, **{'c:a': 'copy', 'bsf:a': 'aac_adtstoasc'})
+                .overwrite_output()
+                .global_args("-re")
+                .run()
+            )
+        except KeyboardInterrupt:
+            try:
+                proc.stdin.write('q'.encode('utf-8'))
+            except:
+                pass
+        except BaseException as e:
+            logging.error(e)
+            raise BaseException("Command failed.")
+
+    return True
 
 
 def get_online(url):
@@ -124,16 +119,14 @@ class RoomMonitor:
         count = self.interval
         logging.debug('start record video.')
         while True:
-
             for i in range(self.nRooms):
-
                 if self.vRecords[i] is not None:
                     if self.vRecords[i].isRecording:
                         # logging.debug('already recording...')
                         continue
                     else:
                         self.vRecords[i] = None
-
+                        logging.debug('delete recording...')
                 if self.vRecords[i] is None:
                     room_url_key = self.room_url_keys[i]
                     try:
@@ -165,15 +158,13 @@ class VideoRecorder:
         self.isRecording = True
         try:
             url = "https://www.showroom-live.com/" + self.room_url_key
-
             logging.info(self.room_url_key +
                          "\'s live show is currently online.")
-
             if not os.path.isdir('videos'):
                 os.makedirs('videos')
-
             showroom_download(url, output_dir='videos')
 
         except BaseException as e:
             logging.error(e)
             self.isRecording = False
+            logging.debug('record video failed.')
