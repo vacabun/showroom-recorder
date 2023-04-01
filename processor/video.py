@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 import os
-import sys
 import time
 import logging
 import threading
 import json
-import re
-import subprocess
 import ffmpeg
 
-from you_get.common import match1, get_content
+
+from you_get.common import get_content, match1
 
 from utils import config
 
@@ -31,48 +29,52 @@ def showroom_get_roomid_by_room_url_key(room_url_key):
     assert roomid
     return roomid
 
-
 # ----------------------------------------------------------------------
-def showroom_download(url, output_dir='.'):
-    if re.match(r'(\w+)://www.showroom-live.com/([-\w]+)', url):
-        room_url_key = match1(url, r'\w+://www.showroom-live.com/([-\w]+)')
-        room_id = showroom_get_roomid_by_room_url_key(room_url_key)
-        while True:
-            timestamp = str(int(time.time() * 1000))
-            api_endpoint = 'https://www.showroom-live.com/api/live/streaming_url?room_id={room_id}&_={timestamp}'.format(
-                room_id=room_id, timestamp=timestamp)
-            html = get_content(api_endpoint)
-            html = json.loads(html)
-            if len(html) >= 1:
-                break
-            logging.w('The live show is currently offline.')
-            time.sleep(1)
 
-        stream_url = [i['url'] for i in html['streaming_url_list']
-                      if i['is_default'] and i['type'] == 'hls'][0]
 
-        title = '{room_url_key}_{time}'.format(
-            room_url_key=room_url_key, time=time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime()))
+def showroom_download(room_url_key, output_dir='.'):
 
-        output = output_dir + '/' + title + '.' + 'mp4'
+    room_id = showroom_get_roomid_by_room_url_key(room_url_key)
+    while True:
+        timestamp = str(int(time.time() * 1000))
+        api_endpoint = 'https://www.showroom-live.com/api/live/streaming_url?room_id={room_id}&_={timestamp}'.format(
+            room_id=room_id, timestamp=timestamp)
+        html = get_content(api_endpoint)
+        html = json.loads(html)
+        if len(html) >= 1:
+            break
+        logging.w('The live show is currently offline.')
+        time.sleep(1)
 
+    stream_url = [i['url'] for i in html['streaming_url_list']
+                  if i['is_default'] and i['type'] == 'hls'][0]
+
+    title = '{room_url_key}_{time}'.format(
+        room_url_key=room_url_key, time=time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime()))
+
+    output = output_dir + '/' + title + '.' + 'mp4'
+
+    try:
+        proc = (
+            ffmpeg
+            .input(stream_url)
+            .output(output, **{'c:a': 'copy', 'bsf:a': 'aac_adtstoasc'})
+            .overwrite_output()
+            .global_args("-re")
+            .run()
+        )
+    except KeyboardInterrupt:
         try:
-            proc = (
-                ffmpeg
-                .input(stream_url)
-                .output(output, **{'c:a': 'copy', 'bsf:a': 'aac_adtstoasc'})
-                .overwrite_output()
-                .global_args("-re")
-                .run()
-            )
-        except KeyboardInterrupt:
-            try:
-                proc.stdin.write('q'.encode('utf-8'))
-            except:
-                pass
-        except BaseException as e:
-            logging.error(e)
-            raise BaseException('ffmpeg error.')
+            proc.stdin.write('q'.encode('utf-8'))
+        except:
+            pass
+    except BaseException as e:
+        logging.error(e)
+        try:
+            proc.stdin.write('q'.encode('utf-8'))
+        except:
+            pass
+        raise BaseException('ffmpeg error.')
 
     return True
 
@@ -157,13 +159,9 @@ class VideoRecorder:
     def record(self):
         self.isRecording = True
         try:
-            url = "https://www.showroom-live.com/" + self.room_url_key
-            logging.info(self.room_url_key +
-                         "\'s live show is currently online.")
             if not os.path.isdir('videos'):
                 os.makedirs('videos')
-            showroom_download(url, output_dir='videos')
-
+            showroom_download(self.room_url_key, output_dir='videos')
         except BaseException as e:
             logging.error(e)
             self.isRecording = False
