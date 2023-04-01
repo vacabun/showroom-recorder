@@ -58,7 +58,7 @@ def showroom_download(room_url_key, output_dir='.'):
         proc = (
             ffmpeg
             .input(stream_url)
-            .output(output, **{'c:a': 'copy', 'bsf:a': 'aac_adtstoasc'})
+            .output(output, **{'c:a': 'copy', 'bsf:a': 'aac_adtstoasc','loglevel': 'error'})
             .overwrite_output()
             .global_args("-re")
             .run()

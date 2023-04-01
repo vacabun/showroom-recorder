@@ -39,7 +39,7 @@ if __name__ == "__main__":
 
     # build ArgumentParser
     parser = argparse.ArgumentParser(
-        description='Monitoring showroom and download comments to danmaku ass')
+        description='download showroom video and  comments')
     parser.add_argument('-i', '--id', help='Only monitor this one showroom id. \
                 For more rooms, please edit file "romms.ini".', metavar='SHOWROOM_ID', dest='sr_id')
 
