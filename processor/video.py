@@ -72,7 +72,7 @@ def showroom_download(url, output_dir='.'):
                 pass
         except BaseException as e:
             logging.error(e)
-            raise BaseException("Command failed.")
+            raise BaseException('ffmpeg error.')
 
     return True
 
