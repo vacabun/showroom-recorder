@@ -16,7 +16,7 @@ if __name__ == "__main__":
 
     # build logging
     log = logging.getLogger()
-    log.setLevel(logging.DEBUG)
+    log.setLevel(logging.INFO)
 
     consoleHandler = logging.StreamHandler()
     consoleFmt = logging.Formatter(

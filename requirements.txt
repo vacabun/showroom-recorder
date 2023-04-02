@@ -2,5 +2,5 @@ emoji
 pytz
 requests
 websocket_client
-you_get
 ffmpeg-python
+streamlink
