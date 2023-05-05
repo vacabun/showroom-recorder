@@ -40,12 +40,15 @@ def showroom_download(room_url_key, output_dir='.'):
             .output(output, **kwargs_dict)
             .run()
         )
+        stdout, stderr = proc.communicate()
+
+
     except KeyboardInterrupt:
         try:
             proc.stdin.write('q'.encode('utf-8'))
         except:
             pass
-    except BaseException as e:
+    except Exception as e:
         # logging.error(e)
         try:
             proc.stdin.write('q'.encode('utf-8'))
