@@ -8,9 +8,6 @@ import streamlink
 
 from utils import config
 
-os.chdir(os.path.dirname(__file__))
-
-
 def showroom_download(room_url_key, output_dir='.'):
 
     url = 'https://www.showroom-live.com/r/{room_url_key}'.format(

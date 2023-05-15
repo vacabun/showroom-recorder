@@ -7,9 +7,6 @@ from utils import config
 from processor import danmaku
 from processor import video
 
-os.chdir(os.path.dirname(__file__))
-
-
 if __name__ == "__main__":
     room_url_keys = config.readRoomsFile('rooms.ini')
     danmaku_settings = config.readSettingsFile('config.ini')
