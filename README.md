@@ -49,7 +49,7 @@ The recorded video will be stored in the save folder.
 
 And the comments will be saved in the comments folder as subtitles.
 
-## D0cker.
+## Docker.
 
 1. Create new directories `data/comments` and `data/videos`.
 
