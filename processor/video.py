@@ -5,22 +5,42 @@ import logging
 import threading
 import ffmpeg
 import streamlink
+import json
+from you_get.common import get_content, match1
 
 from utils import config
+
+use_streamlink = False
 
 def showroom_download(room_url_key, output_dir='.'):
 
     url = 'https://www.showroom-live.com/r/{room_url_key}'.format(
         room_url_key=room_url_key)
-    stream_quality = "best"
-    streams = streamlink.streams(url)
-    available_qualities = streams.keys()
-    if stream_quality not in available_qualities:
-        raise BaseException('stream quality {stream_quality} is not available.'.format(
-            stream_quality=stream_quality))
+    
+    if use_streamlink:
+        stream_quality = "best"
+        streams = streamlink.streams(url)
+        available_qualities = streams.keys()
+        if stream_quality not in available_qualities:
+            raise BaseException('stream quality {stream_quality} is not available.'.format(
+                stream_quality=stream_quality))
 
-    stream_url = streams[stream_quality].url
-
+        stream_url = streams[stream_quality].url
+    else:
+        while True:
+            room_id = showroom_get_roomid_by_room_url_key(room_url_key)
+            timestamp = str(int(time.time() * 1000))
+            api_endpoint = 'https://www.showroom-live.com/api/live/streaming_url?room_id={room_id}&_={timestamp}'.format(
+                room_id=room_id, timestamp=timestamp)
+            html = get_content(api_endpoint)
+            html = json.loads(html)
+            if len(html) >= 1:
+                break
+            logging.w('The live show is currently offline.')
+            time.sleep(1)
+        stream_url = [i['url'] for i in html['streaming_url_list']
+                  if i['is_default'] and i['type'] == 'hls'][0]
+            
     title = '{room_url_key}_{time}'.format(
         room_url_key=room_url_key, time=time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime()))
 
@@ -54,16 +74,43 @@ def showroom_download(room_url_key, output_dir='.'):
         raise BaseException('ffmpeg finish.')
 
     return True
-
+        
+def showroom_get_roomid_by_room_url_key(room_url_key):
+    """str->str"""
+    fake_headers_mobile = {
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Charset': 'UTF-8,*;q=0.5',
+        'Accept-Encoding': 'gzip,deflate,sdch',
+        'Accept-Language': 'en-US,en;q=0.8',
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.2; Nexus 4 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.114 Mobile Safari/537.36'
+    }
+    webpage_url = 'https://www.showroom-live.com/' + room_url_key
+    html = get_content(webpage_url, headers=fake_headers_mobile)
+    roomid = match1(html, r'room\?room_id\=(\d+)')
+    assert roomid
+    return roomid
 
 def get_online(room_url_key):
     url = 'https://www.showroom-live.com/r/{room_url_key}'.format(
         room_url_key=room_url_key)
-    streams = streamlink.streams(url)
-    if not streams:
-        return False
+    if use_streamlink:
+        streams = streamlink.streams(url)
+        if not streams:
+            return False
+        else:
+            return True
     else:
-        return True
+        room_id = showroom_get_roomid_by_room_url_key(room_url_key)
+        timestamp = str(int(time.time() * 1000))
+        api_endpoint = 'https://www.showroom-live.com/api/live/streaming_url?room_id={room_id}&_={timestamp}'.format(
+            room_id=room_id, timestamp=timestamp)
+        html = get_content(api_endpoint)
+        html = json.loads(html)
+        if len(html) >= 1:
+            return True
+        else:
+            return False
+
 
 
 class RoomMonitor:
