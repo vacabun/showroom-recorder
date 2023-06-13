@@ -31,17 +31,20 @@ def getOnLives():
     sr_onlives_url = 'https://www.showroom-live.com/api/live/onlives' + \
         '?' + str(rand)
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5)\
+              AppleWebKit/537.36 (KHTML, like Gecko) \
+                Chrome/50.0.2661.102 Safari/537.36'}
     try:
         r = requests.get(sr_onlives_url, headers=headers)
     except requests.exceptions.ConnectionError as e:
-        logging.error('Connection error, wait for 60s...')
-        time.sleep(60)
+        logging.debug(e)
+        logging.debug('Connection error, wait for 1s...')
+        time.sleep(1)
         return [], []
     except Exception as e:
-        logging.error(
-            'getOnLives error, wait for 60s...: {} - {}'.format(type(e).__name__, e))
-        time.sleep(60)
+        logging.debug(
+            'getOnLives error, wait for 1s...: {} - {}'.format(type(e).__name__, e))
+        time.sleep(1)
         return [], []
 
     if r.status_code != 200:
