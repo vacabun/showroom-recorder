@@ -1,7 +1,6 @@
-import os
 import logging
 import argparse
-import time 
+import time
 
 from utils import config
 from processor import danmaku
@@ -43,7 +42,6 @@ if __name__ == "__main__":
     log.debug('program_settings = {}'.format(danmaku_settings['program_settings']))
     log.debug('danmaku_settings = {}'.format(danmaku_settings['danmaku_settings']))
 
-
     # handle args
     args = parser.parse_args()
 
@@ -71,10 +69,8 @@ if __name__ == "__main__":
             log.info('Comments off')
         # start monitoring room
 
-
     danmaku_rm = danmaku.RoomMonitor(room_url_keys, danmaku_settings)
     danmaku_rm.start()
-    
     video_rm = video.RoomMonitor(room_url_keys, danmaku_settings)
     video_rm.start()
 
