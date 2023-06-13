@@ -1,7 +1,6 @@
-save/
-
-
 *.DS_Store
 *__pycache__
 comments/
 videos/
+rooms.ini
+
