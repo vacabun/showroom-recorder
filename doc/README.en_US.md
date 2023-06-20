@@ -12,7 +12,7 @@ A Script for Recording Showroom Streaming Video
 2.Install requirements.
 
 ``` shell
-pip install -r requirements.txt
+pip install showroom-recorder
 ```
 
 3.Install ffmpeg
@@ -28,7 +28,7 @@ sudo apt install ffmpeg
 Directly input the member room name as a parameter:
 
 ``` shell
-python3 main.py -i LOVE_MAIKA_SASAKI
+showroom-recorder -i LOVE_MAIKA_SASAKI
 ```
 
 Or modify the rooms.ini file，and run without parameter. 
@@ -42,7 +42,7 @@ The configuration file will be automatically created on the first run.
 > Enter multiple room names separated by line breaks and use "#" for comments.
 
 ``` shell
-python3 main.py
+showroom-recorder
 ```
 
 The recorded video will be stored in the save folder.
