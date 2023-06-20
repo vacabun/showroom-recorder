@@ -12,7 +12,7 @@
 2.安装python环境。
 
 ``` shell
-sudo pip install -r requirements.txt
+pip install showroom-recorder
 ```
 
 2.安装ffmpeg。
@@ -28,7 +28,7 @@ sudo apt install ffmpeg
 使用方法为直接将成员房间名作为参数运行脚本：
 
 ``` shell
-python3 main.py -i LOVE_MAIKA_SASAKI
+showroom-recorder -i LOVE_MAIKA_SASAKI
 ```
 
 或者修改`rooms.ini`文件不加参数直接运行脚本，首次运行将会自动创建配置文件。
@@ -40,7 +40,7 @@ python3 main.py -i LOVE_MAIKA_SASAKI
 > 多个房间名换行输入，使用#注释
 
 ``` shell
-python3 main.py
+showroom-recorder
 ```
 
 录制的视频将会被存储在`save`文件夹下
