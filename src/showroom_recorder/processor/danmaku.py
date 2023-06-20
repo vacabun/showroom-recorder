@@ -10,7 +10,7 @@ import logging.handlers
 
 from json import JSONDecodeError
 from argparse import ArgumentParser
-from utils import delete_emoji
+from ..utils import delete_emoji
 # requirements.txt
 import pytz
 import requests

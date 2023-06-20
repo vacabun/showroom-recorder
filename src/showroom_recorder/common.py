@@ -1,12 +1,14 @@
+#!/usr/bin/env python3
+
 import logging
 import argparse
 import time
 
-from utils import config
-from processor import danmaku
-from processor import video
+from .utils import config
+from .processor import danmaku
+from .processor import video
 
-if __name__ == "__main__":
+def main():
     room_url_keys = config.readRoomsFile('rooms.ini')
     danmaku_settings = config.readSettingsFile('config.ini')
 
@@ -97,3 +99,4 @@ if __name__ == "__main__":
     log.info('quitting jobs...')
     danmaku_rm.quit()
     log.info("bye")
+    # handle arguments

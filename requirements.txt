@@ -1,7 +1,0 @@
-emoji
-pytz
-requests
-websocket_client
-ffmpeg-python
-streamlink
-you-get

@@ -1,0 +1,24 @@
+{
+    "name": "showroom-recorder",
+    "author": "vacabun",
+    "author_email": "maguotong66@gmail.com",
+    "url": "https://github.com/vacabun/showroom-recorder",
+    "license": "GPL",
+  
+    "description": "Recording Showroom Streaming Video",
+    "keywords": "video download showroom",
+  
+    "console_scripts": [
+      "showroom-recorder = showroom_recorder.__main__:main"
+    ],
+
+    "install_requires": [
+        "emoji",
+        "pytz",
+        "requests",
+        "websocket_client",
+        "ffmpeg-python",
+        "streamlink",
+        "you-get"
+    ]
+  }
