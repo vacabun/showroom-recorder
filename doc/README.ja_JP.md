@@ -11,7 +11,7 @@ SHOWROOMビデオを録画するためのスクリプト
 2. python環境をインストールしてください。
 
 ``` shell
-sudo pip install -r requirements.txt
+pip install showroom-recorder
 ```
 
 3. ffmpegをインストールしてください。
@@ -26,7 +26,7 @@ sudo apt install ffmpeg
 メンバールーム名を引数としてスクリプトを実行します：
 
 ``` shell
-python3 main.py -i LOVE_MAIKA_SASAKI
+showroom-recorder -i LOVE_MAIKA_SASAKI
 ```
 
 または、`rooms.ini`ファイルを編集してパラメータなしでスクリプトを直接実行し、初回実行時に自動的に設定ファイルが作成されます。
@@ -38,7 +38,7 @@ python3 main.py -i LOVE_MAIKA_SASAKI
 > 複数のルーム名を改行して入力し、#でコメントしてください。
 
 ``` shell
-python3 main.py
+showroom-recorder
 ```
 
 録画されたビデオは`save`フォルダーに保存され、コメントは字幕形式で`comments`フォルダーに保存されます。
