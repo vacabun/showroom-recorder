@@ -48,21 +48,3 @@ showroom-recorder
 The recorded video will be stored in the save folder.
 
 And the comments will be saved in the comments folder as subtitles.
-
-## Docker
-
-1. Create new directories `data/comments` and `data/videos`.
-
-2. Enter the directory `data`.
-
-3. Download the docker image
-
-```
-docker pull vacabun/showroom-recorder:latest
-```
-
-4. Create a docker container
-
-```
-docker run -v videos:/root/showroom-recorder/videos -v comments:/root/showroom-recorder/comments -it vacabun/showroom-recorder /bin/bash
-```

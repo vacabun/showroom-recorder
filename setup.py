@@ -24,7 +24,7 @@ setuptools.setup(
     author_email=proj_info['author_email'],
     description=proj_info['description'],
     keywords=proj_info['keywords'],
-    # long_description=README,
+    long_description=README,
     packages=setuptools.find_packages('src'),
     package_dir={'': 'src'},
     test_suite='tests',
