@@ -1,2 +1,2 @@
 test:
-	pip uninstall sr-rec -y; python3 setup.py install; sr-rec
+	pip uninstall showroom-recorder -y; python3 setup.py install; showroom-recorder

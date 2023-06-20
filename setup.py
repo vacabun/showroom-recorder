@@ -4,8 +4,8 @@ import json
 import importlib
 import setuptools
 
-PROJ_NAME = 'sr-rec'
-PACKAGE_NAME = 'sr_rec'
+PROJ_NAME = 'showroom-recorder'
+PACKAGE_NAME = 'showroom_recorder'
 
 PROJ_METADATA = '%s.json' % PROJ_NAME
 
@@ -24,7 +24,7 @@ setuptools.setup(
     author_email=proj_info['author_email'],
     description=proj_info['description'],
     keywords=proj_info['keywords'],
-    long_description=README,
+    # long_description=README,
     packages=setuptools.find_packages('src'),
     package_dir={'': 'src'},
     test_suite='tests',
