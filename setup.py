@@ -12,7 +12,7 @@ PROJ_METADATA = '%s.json' % PROJ_NAME
 here = os.path.abspath(os.path.dirname(__file__))
 proj_info = json.loads(open(os.path.join(here, PROJ_METADATA), encoding='utf-8').read())
 
-README = open(os.path.join(here, 'README.md'), encoding='utf-8').read()
+Description = open(os.path.join(here, 'description.md'), encoding='utf-8').read()
 
 VERSION = importlib.machinery.SourceFileLoader("version", os.path.join(here, 'src/%s/version.py' % PACKAGE_NAME)).load_module().__version__
 
@@ -24,7 +24,8 @@ setuptools.setup(
     author_email=proj_info['author_email'],
     description=proj_info['description'],
     keywords=proj_info['keywords'],
-    long_description=README,
+    long_description=Description,
+    long_description_content_type='text/markdown',
     packages=setuptools.find_packages('src'),
     package_dir={'': 'src'},
     test_suite='tests',
