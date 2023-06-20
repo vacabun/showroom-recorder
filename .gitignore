@@ -3,4 +3,8 @@
 comments/
 videos/
 rooms.ini
-
+config.ini
+.venv
+*.egg-info
+*build
+*dist

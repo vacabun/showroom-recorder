@@ -1,0 +1,24 @@
+{
+    "name": "sr-rec",
+    "author": "vacabun",
+    "author_email": "maguotong66@gmail.com",
+    "url": "https://github.com/vacabun/showroom-recorder",
+    "license": "GPL",
+  
+    "description": "Dumb downloader that scrapes the web",
+    "keywords": "video download showroom",
+  
+    "console_scripts": [
+      "sr-rec = sr_rec.__main__:main"
+    ],
+
+    "install_requires": [
+        "emoji",
+        "pytz",
+        "requests",
+        "websocket_client",
+        "ffmpeg-python",
+        "streamlink",
+        "you-get"
+    ]
+  }
