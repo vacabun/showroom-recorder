@@ -8,6 +8,6 @@ RUN apt update
 
 RUN apt install -y ffmpeg python3-pip
  
-RUN pip install -r requirements.txt
+RUN pip install showroom-recorder
 
 

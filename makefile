@@ -1,2 +1,2 @@
-test:
-	pip uninstall showroom-recorder -y; python3 setup.py install; showroom-recorder
+reinstall:
+	pip uninstall showroom-recorder -y; pip install .

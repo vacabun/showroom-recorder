@@ -4,37 +4,44 @@ import time
 import logging
 import threading
 import ffmpeg
-import streamlink
 import json
-from you_get.common import get_content, match1
+import requests
+import re
 
-use_streamlink = True
+fake_headers = {
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    'Accept-Charset': 'UTF-8,*;q=0.5',
+    'Accept-Encoding': 'gzip,deflate,sdch',
+    'Accept-Language': 'en-US,en;q=0.8',
+    'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.2; Nexus 4 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.114 Mobile Safari/537.36'
+    }
+
+
+def get_showroom_stream_url(room_url_key):
+    stream_url = ''
+    try:
+        room_id = showroom_get_roomid_by_room_url_key(room_url_key)
+    except Exception:
+        raise Exception('get room_id error.')
+    api_endpoint = 'https://www.showroom-live.com/api/live/streaming_url?room_id={room_id}&_={timestamp}&abr_available=1'.format(
+        room_id=room_id, timestamp=str(int(time.time() * 1000)))
+    try:
+        response = requests.get(url=api_endpoint, headers=fake_headers).text
+        response = json.loads(response)
+        stream_url = response['streaming_url_list'][0]['url']
+        for streaming_url in response['streaming_url_list']:
+            if streaming_url['type'] == 'hls_all':
+                stream_url = streaming_url['url']
+    except Exception:
+        raise Exception('The live show is currently offline.')
+    return stream_url
 
 
 def showroom_download(room_url_key, output_dir='.'):
-    url = 'https://www.showroom-live.com/{room_url_key}'.format(
-        room_url_key=room_url_key)
-    if use_streamlink:
-        stream_quality = "best"
-        streams = streamlink.streams(url)
-        available_qualities = streams.keys()
-        if stream_quality not in available_qualities:
-            raise Exception('stream quality {q} is not available.'.format(
-                q=stream_quality))
-
-        stream_url = streams[stream_quality].url
-    else:
-        room_id = showroom_get_roomid_by_room_url_key(room_url_key)
-        timestamp = str(int(time.time() * 1000))
-        api_header = 'https://www.showroom-live.com/api/live/streaming_url'
-        api_endpoint = api_header + '?room_id={room_id}&_={timestamp}'.format(
-            room_id=room_id, timestamp=timestamp)
-        html = get_content(api_endpoint)
-        html = json.loads(html)
-        if len(html) == 0:
-            raise BaseException('The live show is currently offline.')
-        stream_url = [i['url'] for i in html['streaming_url_list']
-                      if i['is_default'] and i['type'] == 'hls'][0]
+    try:
+        stream_url = get_showroom_stream_url(room_url_key)
+    except Exception as e:
+        raise Exception('get stream url error: ' + e)
 
     title = '{room_url_key}_{time}'.format(
         room_url_key=room_url_key,
@@ -69,41 +76,31 @@ def showroom_download(room_url_key, output_dir='.'):
 
 
 def showroom_get_roomid_by_room_url_key(room_url_key):
-    """str->str"""
-    fake_headers_mobile = {
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Charset': 'UTF-8,*;q=0.5',
-        'Accept-Encoding': 'gzip,deflate,sdch',
-        'Accept-Language': 'en-US,en;q=0.8',
-        'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.2; Nexus 4 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.114 Mobile Safari/537.36'
-    }
+
     webpage_url = 'https://www.showroom-live.com/' + room_url_key
-    html = get_content(webpage_url, headers=fake_headers_mobile)
-    roomid = match1(html, r'room\?room_id\=(\d+)')
-    assert roomid
-    return roomid
+    try:
+        response = requests.get(url=webpage_url, headers=fake_headers).text
+        match = re.search(r'room\?room_id\=(\d+)', response)
+        if match:
+            room_id = match.group(1)
+            return room_id
+    except Exception:
+        raise Exception('get room_id error.')
 
 
 def get_online(room_url_key):
-    url = 'https://www.showroom-live.com/{room_url_key}'.format(
-        room_url_key=room_url_key)
-    if use_streamlink:
-        streams = streamlink.streams(url)
-        if not streams:
-            return False
-        else:
-            return True
-    else:
+    try:
         room_id = showroom_get_roomid_by_room_url_key(room_url_key)
-        timestamp = str(int(time.time() * 1000))
-        api_endpoint = 'https://www.showroom-live.com/api/live/streaming_url?room_id={room_id}&_={timestamp}'.format(
-            room_id=room_id, timestamp=timestamp)
-        html = get_content(api_endpoint)
-        html = json.loads(html)
-        if len(html) >= 1:
-            return True
-        else:
-            return False
+    except Exception:
+        return False
+    api_endpoint = 'https://www.showroom-live.com/api/live/live_info?room_id={room_id}'.format(
+        room_id=room_id)
+    response = requests.get(url=api_endpoint, headers=fake_headers).text
+    response = json.loads(response)
+    if response['live_status'] == 2:
+        return True
+    else:
+        return False
 
 
 class RoomMonitor:
@@ -180,4 +177,3 @@ class VideoRecorder:
             self.isRecording = False
             logging.info('{room_url_key}: record video finished.'.format(
                 room_url_key=self.room_url_key))
-
