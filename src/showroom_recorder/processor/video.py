@@ -185,7 +185,7 @@ class VideoRecorder:
             if not os.path.isdir('videos'):
                 os.makedirs('videos')
             download(self.status, output_dir='videos')
-        except Exception as e:
+        except Exception:
             self.isRecording = False
             logging.error('{room_url_key}: record video finished.'.format(
-                room_url_key=self.room_url_key) + e)
+                room_url_key=self.room_url_key))
