@@ -6,7 +6,8 @@ import threading
 import ffmpeg
 import json
 import requests
-import re
+import datetime
+import pytz
 
 fake_headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -17,12 +18,49 @@ fake_headers = {
     }
 
 
-def get_showroom_stream_url(room_url_key):
+def get_status_by_room_url_key(room_url_key):
+    url = "https://www.showroom-live.com/api/room/status"
+    params = {
+        "room_url_key": room_url_key,
+    }
+    response = requests.get(url=url, headers=fake_headers, params=params)
+    status = response.json()
+    return status
+
+
+def get_room_url_key_by_status(status):
+    return status['room_url_key']
+
+
+def get_roomid_by_status(status):
+    return status['room_id']
+
+
+def get_online_by_status(status):
+    return status['is_live']
+
+
+def get_room_name_by_status(status):
+    return status['room_name']
+
+
+def get_start_time_by_status(status):
+    t = status['started_at']
+    dt = datetime.datetime.utcfromtimestamp(t)
+    tz = pytz.timezone('Asia/Tokyo')
+    dt = dt.astimezone(tz)
+    return dt
+
+
+def get_time_now():
+    dt = datetime.datetime.now()
+    tz = pytz.timezone('Asia/Tokyo')
+    dt = dt.astimezone(tz)
+    return dt
+
+
+def get_stream_url_by_roomid(room_id):
     stream_url = ''
-    try:
-        room_id = showroom_get_roomid_by_room_url_key(room_url_key)
-    except Exception:
-        raise Exception('get room_id error.')
     api_endpoint = 'https://www.showroom-live.com/api/live/streaming_url?room_id={room_id}&_={timestamp}&abr_available=1'.format(
         room_id=room_id, timestamp=str(int(time.time() * 1000)))
     try:
@@ -32,21 +70,23 @@ def get_showroom_stream_url(room_url_key):
         for streaming_url in response['streaming_url_list']:
             if streaming_url['type'] == 'hls_all':
                 stream_url = streaming_url['url']
-    except Exception:
-        raise Exception('The live show is currently offline.')
+    except Exception as e:
+        raise Exception('get stream url error: ' + e)
     return stream_url
 
 
-def showroom_download(room_url_key, output_dir='.'):
+def download(status, output_dir='.'):
     try:
-        stream_url = get_showroom_stream_url(room_url_key)
+        stream_url = get_stream_url_by_roomid(get_roomid_by_status(status))
     except Exception as e:
         raise Exception('get stream url error: ' + e)
-
-    title = '{room_url_key}_{time}'.format(
-        room_url_key=room_url_key,
-        time=time.strftime("%Y%m%d_%H%M%S", time.localtime()))
-    output = output_dir + '/' + title + '.' + 'mp4'
+    try:
+        title = '{name}_{time}'.format(
+            name=get_room_url_key_by_status(status),
+            time=get_time_now().strftime('%Y%m%d_%H%M%S'))
+        output = output_dir + '/' + title + '.' + 'mp4'
+    except Exception as e:
+        raise Exception('get title error: ' + e)
 
     kwargs_dict = {'c:v': 'copy',
                    'c:a': 'copy',
@@ -75,34 +115,6 @@ def showroom_download(room_url_key, output_dir='.'):
     return True
 
 
-def showroom_get_roomid_by_room_url_key(room_url_key):
-
-    webpage_url = 'https://www.showroom-live.com/' + room_url_key
-    try:
-        response = requests.get(url=webpage_url, headers=fake_headers).text
-        match = re.search(r'room\?room_id\=(\d+)', response)
-        if match:
-            room_id = match.group(1)
-            return room_id
-    except Exception:
-        raise Exception('get room_id error.')
-
-
-def get_online(room_url_key):
-    try:
-        room_id = showroom_get_roomid_by_room_url_key(room_url_key)
-    except Exception:
-        return False
-    api_endpoint = 'https://www.showroom-live.com/api/live/live_info?room_id={room_id}'.format(
-        room_id=room_id)
-    response = requests.get(url=api_endpoint, headers=fake_headers).text
-    response = json.loads(response)
-    if response['live_status'] == 2:
-        return True
-    else:
-        return False
-
-
 class RoomMonitor:
     def __init__(self, room_url_keys, settings):
         self.room_url_keys = room_url_keys
@@ -126,8 +138,6 @@ class RoomMonitor:
     def monitor(self):
         self.nRooms = len(self.room_url_keys)
         self.vRecords = [None] * self.nRooms
-
-        logging.debug('start record video.')
         while True:
             for i in range(self.nRooms):
                 if self.vRecords[i] is not None:
@@ -141,24 +151,26 @@ class RoomMonitor:
                 if self.vRecords[i] is None:
                     room_url_key = self.room_url_keys[i]
                     try:
-                        if get_online(room_url_key):
-                            vr = VideoRecorder(room_url_key, self.settings)
+                        status = get_status_by_room_url_key(room_url_key)
+                        if get_online_by_status(status):
+                            vr = VideoRecorder(status, self.settings)
                             vr.start()
                             self.vRecords[i] = vr
                             continue
                     except Exception as e:
-                        logging.debug('{room_url_key}: {e}'.format(
+                        logging.error('{room_url_key}: {e}'.format(
                             room_url_key=room_url_key, e=e))
             time.sleep(1)
         # end while
 
 
 class VideoRecorder:
-    def __init__(self, room_url_key, settings):
-        self.room_url_key = room_url_key
+    def __init__(self, status, settings):
+        self.room_url_key = status['room_url_key']
         self.settings = settings
         self.isRecording = False
         self._thread_main = None
+        self.status = status
 
     def start(self):
         self._thread_main = threading.Thread(target=self.record)
@@ -172,8 +184,8 @@ class VideoRecorder:
         try:
             if not os.path.isdir('videos'):
                 os.makedirs('videos')
-            showroom_download(self.room_url_key, output_dir='videos')
-        except Exception:
+            download(self.status, output_dir='videos')
+        except Exception as e:
             self.isRecording = False
-            logging.info('{room_url_key}: record video finished.'.format(
-                room_url_key=self.room_url_key))
+            logging.error('{room_url_key}: record video finished.'.format(
+                room_url_key=self.room_url_key) + e)
