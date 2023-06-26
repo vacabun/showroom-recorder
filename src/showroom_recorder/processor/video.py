@@ -10,13 +10,17 @@ import datetime
 import pytz
 from .uploader import UploaderQueue, UploaderWebDav
 import random
+from fake_useragent import UserAgent
+
+
+ua = UserAgent()
 
 fake_headers = {
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    'Accept': '*/*',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Accept-Language': 'zh,en-US;q=0.9,en;q=0.8,zh-CN;q=0.7,ja;q=0.6',
     'Accept-Charset': 'UTF-8,*;q=0.5',
-    'Accept-Encoding': 'gzip,deflate,sdch',
-    'Accept-Language': 'en-US,en;q=0.8',
-    'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.2; Nexus 4 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.114 Mobile Safari/537.36'
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
 }
 
 
@@ -26,6 +30,7 @@ def get_status_by_room_url_key(room_url_key):
         "room_url_key": room_url_key,
         "_": str(int(time.time() * 1000))
     }
+    fake_headers['User-Agent'] = ua.chrome
     response = requests.get(url=url, headers=fake_headers, params=params)
     status = response.json()
     return status
@@ -37,6 +42,7 @@ def get_online_by_roomid(room_id):
         "room_id": room_id,
         "_": str(int(time.time() * 1000))
     }
+    fake_headers['User-Agent'] = ua.chrome
     response = requests.get(url=url, headers=fake_headers, params=params)
     response = response.json()
     if response['live_status'] == 2:
@@ -81,6 +87,7 @@ def get_stream_url_by_roomid(room_id):
     api_endpoint = 'https://www.showroom-live.com/api/live/streaming_url?room_id={room_id}&_={timestamp}&abr_available=1'.format(
         room_id=room_id, timestamp=str(int(time.time() * 1000)))
     try:
+        fake_headers['User-Agent'] = ua.chrome
         response = requests.get(url=api_endpoint, headers=fake_headers).text
         response = json.loads(response)
         stream_url = response['streaming_url_list'][0]['url']
@@ -202,7 +209,6 @@ class RecroderManager:
             status = get_status_by_room_url_key(room_url_key)
             room_id = get_roomid_by_status(status)
             room_id_list.append(room_id)
-        time.sleep(1)
         return room_id_list
 
     def manager(self):
