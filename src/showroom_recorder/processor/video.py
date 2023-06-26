@@ -30,6 +30,19 @@ def get_status_by_room_url_key(room_url_key):
     return status
 
 
+def get_online_by_roomid(room_id):
+    url = "https://www.showroom-live.com/api/live/live_info"
+    params = {
+        "room_id": room_id,
+    }
+    response = requests.get(url=url, headers=fake_headers, params=params)
+    response = response.json()
+    if response['live_status'] == 2:
+        return True
+    else:
+        return False
+
+
 def get_room_url_key_by_status(status):
     return status['room_url_key']
 
@@ -163,6 +176,7 @@ class Recorder:
 class RecroderManager:
     def __init__(self, room_url_key_list, config):
         self.room_url_key_list = room_url_key_list
+        self.room_id_list = self.__get_room_id_list()
         self.rooms_num = len(self.room_url_key_list)
         self.recorders = [None] * self.rooms_num
         self.t = None
@@ -180,11 +194,20 @@ class RecroderManager:
         self.t.start()
         return self.t
 
+    def __get_room_id_list(self):
+        room_id_list = []
+        for room_url_key in self.room_url_key_list:
+            status = get_status_by_room_url_key(room_url_key)
+            room_id = get_roomid_by_status(status)
+            room_id_list.append(room_id)
+        return room_id_list
+
     def manager(self):
         self.uploader_queue.start()
         while True:
             for i in range(self.rooms_num):
                 room_url_key = self.room_url_key_list[i]
+                room_id = self.room_id_list[i]
                 if self.recorders[i] is not None:
                     if self.recorders[i].is_recording:
                         continue
@@ -194,8 +217,8 @@ class RecroderManager:
                             room_url_key=room_url_key))
                 if self.recorders[i] is None:
                     try:
-                        status = get_status_by_room_url_key(room_url_key)
-                        if get_online_by_status(status):
+                        if get_online_by_roomid(room_id):
+                            status = get_status_by_room_url_key(room_url_key)
                             r = Recorder(status, self.uploader_queue, self.config)
                             r.start()
                             self.recorders[i] = r
