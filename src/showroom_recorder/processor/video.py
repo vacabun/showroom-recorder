@@ -9,7 +9,7 @@ import requests
 import datetime
 import pytz
 from .uploader import UploaderQueue, UploaderWebDav
-
+import random
 
 fake_headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -24,6 +24,7 @@ def get_status_by_room_url_key(room_url_key):
     url = "https://www.showroom-live.com/api/room/status"
     params = {
         "room_url_key": room_url_key,
+        "_": str(int(time.time() * 1000))
     }
     response = requests.get(url=url, headers=fake_headers, params=params)
     status = response.json()
@@ -34,6 +35,7 @@ def get_online_by_roomid(room_id):
     url = "https://www.showroom-live.com/api/live/live_info"
     params = {
         "room_id": room_id,
+        "_": str(int(time.time() * 1000))
     }
     response = requests.get(url=url, headers=fake_headers, params=params)
     response = response.json()
@@ -200,6 +202,7 @@ class RecroderManager:
             status = get_status_by_room_url_key(room_url_key)
             room_id = get_roomid_by_status(status)
             room_id_list.append(room_id)
+        time.sleep(1)
         return room_id_list
 
     def manager(self):
@@ -226,4 +229,5 @@ class RecroderManager:
                     except Exception as e:
                         logging.error('{room_url_key}: {e}'.format(
                             room_url_key=room_url_key, e=e))
-            time.sleep(1)
+            delay_time = random.uniform(1, 3)
+            time.sleep(delay_time)
