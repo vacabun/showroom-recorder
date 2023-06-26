@@ -8,10 +8,12 @@ from .utils import config
 from .processor import danmaku
 from .processor import video
 
+
 def main():
     room_url_keys = config.readRoomsFile('rooms.ini')
     danmaku_settings = config.readSettingsFile('config.ini')
-
+    video_settings = danmaku_settings['video_settings']
+    
     # build logging
     log = logging.getLogger()
     log.setLevel(logging.INFO)
@@ -44,6 +46,7 @@ def main():
     log.debug('program_settings = {}'.format(danmaku_settings['program_settings']))
     log.debug('danmaku_settings = {}'.format(danmaku_settings['danmaku_settings']))
 
+    
     # handle args
     args = parser.parse_args()
 
@@ -73,7 +76,7 @@ def main():
 
     danmaku_rm = danmaku.RoomMonitor(room_url_keys, danmaku_settings)
     danmaku_rm.start()
-    video_rm = video.RoomMonitor(room_url_keys, danmaku_settings)
+    video_rm = video.RecroderManager(room_url_keys, video_settings)
     video_rm.start()
 
     helptxt = '''

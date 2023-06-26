@@ -61,6 +61,12 @@ font_name = MS PGothic
 font_size = 18
 alpha = 10                       # transparency percentage, a number between 0 and 100
 
+[video_settings]
+upload_webdav = 0                # 1: enable, 0: disable
+webdav_url = http://webdav_url
+webdav_username = username
+webdav_password = password
+
 """
     # create file if not present
     path = os.getcwd()
@@ -75,8 +81,10 @@ alpha = 10                       # transparency percentage, a number between 0 a
 
     foundProgSettings = False
     foundDanmakuSettings = False
+    foundVideoSettings = False
     program_settings = {}
     danmaku_settings = {}
+    video_settings = {}
     for line in lines:
         # remove # and line after it
         sharp = line.find('#')
@@ -89,10 +97,18 @@ alpha = 10                       # transparency percentage, a number between 0 a
         if line.lower().find('[program_settings]') > -1:
             foundProgSettings = True
             foundDanmakuSettings = False
+            foundVideoSettings = False
             continue
         if line.lower().find('[danmaku_settings]') > -1:
             foundProgSettings = False
             foundDanmakuSettings = True
+            foundVideoSettings = False
+            continue
+
+        if line.lower().find('[video_settings]') > -1:
+            foundProgSettings = False
+            foundDanmakuSettings = False
+            foundVideoSettings = True
             continue
 
         if foundProgSettings:
@@ -110,7 +126,19 @@ alpha = 10                       # transparency percentage, a number between 0 a
             danmaku_settings.update({s1: s2})
             continue
 
+        if foundVideoSettings:
+            s1, s2 = line.split("=", 1)
+            s1 = s1.lower().strip()
+            s2 = s2.strip()
+            if s2 == '1':
+                s2 = True
+            if s2 == '0':
+                s2 = False
+            video_settings.update({s1: s2})
+            continue
+
     settings = {'program_settings': program_settings,
-                'danmaku_settings': danmaku_settings}
+                'danmaku_settings': danmaku_settings,
+                'video_settings': video_settings}
     return settings
 
