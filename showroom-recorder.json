@@ -17,6 +17,7 @@
         "pytz",
         "requests",
         "websocket_client",
-        "ffmpeg-python"
+        "ffmpeg-python",
+        "webdav4"
     ]
   }
