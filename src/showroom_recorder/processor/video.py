@@ -10,10 +10,7 @@ import datetime
 import pytz
 from .uploader import UploaderQueue, UploaderWebDav
 import random
-from fake_useragent import UserAgent
-
-
-ua = UserAgent()
+import re
 
 fake_headers = {
     'Accept': '*/*',
@@ -27,22 +24,30 @@ fake_headers = {
 def get_status_by_room_url_key(room_url_key):
     url = "https://www.showroom-live.com/api/room/status"
     params = {
-        "room_url_key": room_url_key,
-        "_": str(int(time.time() * 1000))
+        "room_url_key": room_url_key
     }
-    fake_headers['User-Agent'] = ua.chrome
     response = requests.get(url=url, headers=fake_headers, params=params)
     status = response.json()
     return status
 
 
+def showroom_get_roomid_by_room_url_key(room_url_key):
+    webpage_url = 'https://www.showroom-live.com/r/' + room_url_key
+    try:
+        response = requests.get(url=webpage_url, headers=fake_headers).text
+        match = re.search(r'href="/room/profile\?room_id\=(\d+)"', response)
+        if match:
+            room_id = match.group(1)
+            return room_id
+    except Exception:
+        raise Exception('get room_id error.')
+
+
 def get_online_by_roomid(room_id):
     url = "https://www.showroom-live.com/api/live/live_info"
     params = {
-        "room_id": room_id,
-        "_": str(int(time.time() * 1000))
+        "room_id": room_id
     }
-    fake_headers['User-Agent'] = ua.chrome
     response = requests.get(url=url, headers=fake_headers, params=params)
     response = response.json()
     if response['live_status'] == 2:
@@ -87,7 +92,6 @@ def get_stream_url_by_roomid(room_id):
     api_endpoint = 'https://www.showroom-live.com/api/live/streaming_url?room_id={room_id}&_={timestamp}&abr_available=1'.format(
         room_id=room_id, timestamp=str(int(time.time() * 1000)))
     try:
-        fake_headers['User-Agent'] = ua.chrome
         response = requests.get(url=api_endpoint, headers=fake_headers).text
         response = json.loads(response)
         stream_url = response['streaming_url_list'][0]['url']
@@ -100,15 +104,16 @@ def get_stream_url_by_roomid(room_id):
 
 
 class Recorder:
-    def __init__(self, status, uploader_queue, config):
-        self.room_url_key = status['room_url_key']
+    def __init__(self, room_url_key, room_id, uploader_queue, config):
+        self.room_url_key = room_url_key
+        self.room_id = room_id
+        self.uploader_queue = uploader_queue
         self.config = config
         self.is_recording = False
         self._thread = None
-        self.status = status
         self.ffmpeg_proc = None
         self.output = ''
-        self.uploader_queue = uploader_queue
+        self.user_agent = ''
 
     def start(self):
         self._thread = threading.Thread(target=self.record)
@@ -136,9 +141,8 @@ class Recorder:
                 room_url_key=self.room_url_key))
 
     def download(self, output_dir='.'):
-        status = self.status
         try:
-            stream_url = get_stream_url_by_roomid(get_roomid_by_status(status))
+            stream_url = get_stream_url_by_roomid(self.room_id)
         except Exception as e:
             raise Exception('get stream url error: ' + e)
 
@@ -172,12 +176,12 @@ class Recorder:
     def __download_finish(self):
         if os.path.exists(self.output):
             logging.info('{room_url_key}: video recording finished, saved to {output}.'.format(
-                                room_url_key=self.room_url_key, output=self.output))
+                room_url_key=self.room_url_key, output=self.output))
             if self.config['upload_webdav']:
-                uploader = UploaderWebDav(self.output, 
-                                          self.output, 
-                                          self.config['webdav_url'], 
-                                          self.config['webdav_username'], 
+                uploader = UploaderWebDav(self.output,
+                                          self.output,
+                                          self.config['webdav_url'],
+                                          self.config['webdav_username'],
                                           self.config['webdav_password'])
                 self.uploader_queue.put(uploader)
 
@@ -185,7 +189,6 @@ class Recorder:
 class RecroderManager:
     def __init__(self, room_url_key_list, config):
         self.room_url_key_list = room_url_key_list
-        self.room_id_list = self.__get_room_id_list()
         self.rooms_num = len(self.room_url_key_list)
         self.recorders = [None] * self.rooms_num
         self.t = None
@@ -216,7 +219,6 @@ class RecroderManager:
         while True:
             for i in range(self.rooms_num):
                 room_url_key = self.room_url_key_list[i]
-                room_id = self.room_id_list[i]
                 if self.recorders[i] is not None:
                     if self.recorders[i].is_recording:
                         continue
@@ -226,9 +228,11 @@ class RecroderManager:
                             room_url_key=room_url_key))
                 if self.recorders[i] is None:
                     try:
+                        room_id = showroom_get_roomid_by_room_url_key(
+                            room_url_key)
                         if get_online_by_roomid(room_id):
-                            status = get_status_by_room_url_key(room_url_key)
-                            r = Recorder(status, self.uploader_queue, self.config)
+                            r = Recorder(room_url_key, room_id,
+                                         self.uploader_queue, self.config)
                             r.start()
                             self.recorders[i] = r
                             continue

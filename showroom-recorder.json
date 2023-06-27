@@ -18,7 +18,6 @@
         "requests",
         "websocket_client",
         "ffmpeg-python",
-        "webdav4",
-        "fake-useragent"
+        "webdav4"
     ]
   }
