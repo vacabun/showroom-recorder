@@ -18,6 +18,7 @@
         "requests",
         "websocket_client",
         "ffmpeg-python",
-        "webdav4"
+        "webdav4",
+        "biliup"
     ]
   }

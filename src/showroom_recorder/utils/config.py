@@ -1,4 +1,7 @@
 import os
+import logging
+import json
+
 
 def readRoomsFile(filename):
     roomsTxt = """
@@ -41,8 +44,8 @@ def readRoomsFile(filename):
         if srIdx > -1:
             line = line[len(sr_url):]
         room_url_keys.append(line)
-    return room_url_keys
 
+    return room_url_keys
 
 
 def readSettingsFile(filename):
@@ -62,6 +65,7 @@ font_size = 18
 alpha = 10                       # transparency percentage, a number between 0 and 100
 
 [video_settings]
+interval = 10
 upload_webdav = 0                # 1: enable, 0: disable
 webdav_url = http://webdav_url
 webdav_username = username
@@ -142,3 +146,58 @@ webdav_password = password
                 'video_settings': video_settings}
     return settings
 
+
+def get_biliup_list(filename):
+    path = os.getcwd()
+    filenamepath = os.path.join(path, filename)
+    if not os.path.isfile(filenamepath):
+        with open(filenamepath, 'w', encoding='utf8') as fp:
+            fp.write('\n')
+        logging.info('Created {}'.format(filename))
+
+    with open(filenamepath, 'r', encoding='utf8') as fp:
+        lines = fp.readlines()
+
+    biliup_list = []
+    sr_url = 'https://www.showroom-live.com/'
+
+    for line in lines:
+        # remove # and line after it
+        sharp = line.find('#')
+        if sharp > -1:
+            line = line[:sharp]
+        line = line.strip()
+        if len(line) == 0:
+            continue
+
+        # remove showroom url
+        srIdx = line.find(sr_url)
+        if srIdx > -1:
+            line = line[len(sr_url):]
+        biliup_list.append(line)
+
+    return biliup_list
+
+
+def get_bili_cookie(filename):
+    cookie = """
+{
+    "cookies": {
+        "SESSDATA": "",
+        "bili_jct": "",
+        "DedeUserID__ckMd5": "",
+        "DedeUserID": ""
+    },"access_token": ""
+}
+
+"""
+    path = os.getcwd()
+    filenamepath = os.path.join(path, filename)
+    if not os.path.isfile(filenamepath):
+        with open(filenamepath, 'w', encoding='utf8') as fp:
+            fp.write(cookie)
+        logging.info('Created {}'.format(filename))
+
+    with open(filenamepath, 'rb') as f:
+        data = json.load(f)
+        return data

@@ -8,3 +8,7 @@ config.ini
 *.egg-info
 /build
 /dist
+/test
+bili_cookie.json
+bili.cookie
+biliup.list

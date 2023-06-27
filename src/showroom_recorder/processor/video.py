@@ -8,8 +8,8 @@ import json
 import requests
 import datetime
 import pytz
-from .uploader import UploaderQueue, UploaderWebDav
-import random
+from .uploader import UploaderQueue, UploaderWebDav, UploaderBili
+from ..utils.config import get_bili_cookie, get_biliup_list
 import re
 
 fake_headers = {
@@ -43,17 +43,21 @@ def showroom_get_roomid_by_room_url_key(room_url_key):
         raise Exception('get room_id error.')
 
 
-def get_online_by_roomid(room_id):
+def get_online_by_liveinfo(liveinfo):
+    if liveinfo['live_status'] == 2:
+        return True
+    else:
+        return False
+
+
+def get_liveinfo_by_roomid(room_id):
     url = "https://www.showroom-live.com/api/live/live_info"
     params = {
         "room_id": room_id
     }
     response = requests.get(url=url, headers=fake_headers, params=params)
     response = response.json()
-    if response['live_status'] == 2:
-        return True
-    else:
-        return False
+    return response
 
 
 def get_room_url_key_by_status(status):
@@ -104,9 +108,11 @@ def get_stream_url_by_roomid(room_id):
 
 
 class Recorder:
-    def __init__(self, room_url_key, room_id, uploader_queue, config):
+    def __init__(self, room_url_key, live_info, uploader_queue, config):
         self.room_url_key = room_url_key
-        self.room_id = room_id
+        self.live_info = live_info
+        self.room_name = live_info['room_name']
+        self.room_id = live_info['room_id']
         self.uploader_queue = uploader_queue
         self.config = config
         self.is_recording = False
@@ -114,6 +120,8 @@ class Recorder:
         self.ffmpeg_proc = None
         self.output = ''
         self.user_agent = ''
+        self.upload_to_bilibili = False
+        self.time_str = ''
 
     def start(self):
         self._thread = threading.Thread(target=self.record)
@@ -126,6 +134,9 @@ class Recorder:
         except Exception:
             pass
         # self._thread.join()
+
+    def enable_uploader_bili(self):
+        self.upload_to_bilibili = True
 
     def record(self):
         self.is_recording = True
@@ -146,9 +157,11 @@ class Recorder:
         except Exception as e:
             raise Exception('get stream url error: ' + e)
 
+        self.time_str = get_time_now().strftime('%Y%m%d_%H%M%S')
+
         title = '{name}_{time}'.format(
             name=self.room_url_key,
-            time=get_time_now().strftime('%Y%m%d_%H%M%S'))
+            time=self.time_str)
 
         self.output = output_dir + '/' + title + '.' + 'mp4'
 
@@ -177,13 +190,22 @@ class Recorder:
         if os.path.exists(self.output):
             logging.info('{room_url_key}: video recording finished, saved to {output}.'.format(
                 room_url_key=self.room_url_key, output=self.output))
+
             if self.config['upload_webdav']:
-                uploader = UploaderWebDav(self.output,
-                                          self.output,
-                                          self.config['webdav_url'],
-                                          self.config['webdav_username'],
-                                          self.config['webdav_password'])
-                self.uploader_queue.put(uploader)
+                uploader_webdav = UploaderWebDav(self.output,
+                                                 self.output,
+                                                 self.config['webdav_url'],
+                                                 self.config['webdav_username'],
+                                                 self.config['webdav_password'])
+                self.uploader_queue.put(uploader_webdav)
+
+            if self.upload_to_bilibili:
+                uploader_bili = UploaderBili(file_path=self.output,
+                                             room_url_key=self.room_url_key,
+                                             room_name=self.room_name,
+                                             time_str=self.time_str,
+                                             login_cookie=get_bili_cookie('bili_cookie.json'))
+                self.uploader_queue.put(uploader_bili)
 
 
 class RecroderManager:
@@ -196,6 +218,7 @@ class RecroderManager:
         self._isQuit = False
         self.config = config
         self.uploader_queue = UploaderQueue()
+        self.biliup_list = get_biliup_list('biliup.list')
 
     def quit(self):
         self._isQuit = True
@@ -230,19 +253,22 @@ class RecroderManager:
                             room_url_key=room_url_key))
                 if self.recorders[i] is None:
                     try:
-                        is_live = get_online_by_roomid(room_id)
+                        live_info = get_liveinfo_by_roomid(room_id)
+                        is_live = get_online_by_liveinfo(live_info)
                     except Exception:
                         logging.error('{room_url_key}: get online error wait 30s....'.format(
                             room_url_key=room_url_key))
                         time.sleep(30)
                     if is_live:
                         try:
-                            r = Recorder(room_url_key, room_id,
+                            r = Recorder(room_url_key, live_info,
                                          self.uploader_queue, self.config)
+                            if room_url_key in self.biliup_list:
+                                r.enable_uploader_bili()
                             r.start()
                             self.recorders[i] = r
                             continue
                         except Exception as e:
                             logging.error('{room_url_key}: {e}'.format(
                                 room_url_key=room_url_key, e=e))
-            time.sleep(10)
+            time.sleep(20)

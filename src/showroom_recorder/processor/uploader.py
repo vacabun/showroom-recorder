@@ -3,6 +3,38 @@ import logging
 import threading
 import time
 from webdav4.client import Client
+from biliup.plugins.bili_webup import BiliBili, Data
+
+
+class UploaderBili:
+    def __init__(self, file_path, room_url_key, room_name, time_str, login_cookie):
+        self.file_path = file_path
+        self.room_url_key = room_url_key
+        self.room_name = room_name
+        self.time_str = time_str
+        self.login_cookie = login_cookie
+
+    def upload(self):
+        logging.info('upload by biliup.')
+        video = Data()
+        video.title = self.room_name + ' ' + self.time_str
+        video.desc = self.room_name + ' ' + self.time_str
+        video.source = 'https://www.showroom-live.com/' + self.room_url_key
+        video.tid = 137
+        video.set_tag(['showroom'])
+        video.copyright = 2
+        lines = 'AUTO'
+        tasks = 3
+        dtime = 0
+        file_list = [self.file_path]
+        with BiliBili(video) as bili:
+            bili.login("bili.cookie", self.login_cookie)
+            # bili.login_by_password("username", "password")
+            for file in file_list:
+                video_part = bili.upload_file(file, lines=lines, tasks=tasks)
+                video.append(video_part)
+            video.delay_time(dtime)
+            bili.submit()
 
 
 class UploaderWebDav:
