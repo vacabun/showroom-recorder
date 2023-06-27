@@ -18,8 +18,8 @@ class UploaderBili:
     def upload(self):
         logging.info('upload by biliup.')
         video = Data()
-        video.title = self.room_name + ' ' + self.time_str
-        video.desc = self.room_name + ' ' + self.time_str
+        video.title = self.room_name + ' showroom ' + self.time_str
+        video.desc = self.room_name + ' showroom ' + self.time_str
         video.source = 'https://www.showroom-live.com/' + self.room_url_key
         video.tid = 137
         video.set_tag(['showroom'])
