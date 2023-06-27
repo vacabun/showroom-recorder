@@ -39,7 +39,7 @@ def main():
 
     # build ArgumentParser
     parser = argparse.ArgumentParser(
-        description='download showroom video and  comments')
+        description='download showroom video and comments')
     parser.add_argument('-i', '--id', help='Only monitor this one showroom id. \
                 For more rooms, please edit file "romms.ini".', metavar='SHOWROOM_ID', dest='sr_id')
 
