@@ -232,7 +232,7 @@ class RecroderManager:
                     try:
                         is_live = get_online_by_roomid(room_id)
                     except Exception:
-                        logging.error('{room_url_key}:get online error wait 30s....'.format(
+                        logging.error('{room_url_key}: get online error wait 30s....'.format(
                             room_url_key=room_url_key))
                         time.sleep(30)
                     if is_live:
