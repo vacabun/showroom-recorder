@@ -189,6 +189,7 @@ class Recorder:
 class RecroderManager:
     def __init__(self, room_url_key_list, config):
         self.room_url_key_list = room_url_key_list
+        self.room_id_list = self.__get_room_id_list()
         self.rooms_num = len(self.room_url_key_list)
         self.recorders = [None] * self.rooms_num
         self.t = None
@@ -219,6 +220,7 @@ class RecroderManager:
         while True:
             for i in range(self.rooms_num):
                 room_url_key = self.room_url_key_list[i]
+                room_id = self.room_id_list[i]
                 if self.recorders[i] is not None:
                     if self.recorders[i].is_recording:
                         continue
@@ -228,8 +230,6 @@ class RecroderManager:
                             room_url_key=room_url_key))
                 if self.recorders[i] is None:
                     try:
-                        room_id = showroom_get_roomid_by_room_url_key(
-                            room_url_key)
                         if get_online_by_roomid(room_id):
                             r = Recorder(room_url_key, room_id,
                                          self.uploader_queue, self.config)
@@ -239,5 +239,4 @@ class RecroderManager:
                     except Exception as e:
                         logging.error('{room_url_key}: {e}'.format(
                             room_url_key=room_url_key, e=e))
-                delay_time = random.uniform(0.1, 0.3)
-                time.sleep(delay_time)
+            time.sleep(10)
