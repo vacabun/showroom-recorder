@@ -1,5 +1,5 @@
-from showroom_recorder.processor.uploader import UploaderBili
-from showroom_recorder.utils.config import get_bili_cookie
+from ..src.showroom_recorder.processor.uploader import UploaderBili
+from ..src.showroom_recorder.utils.config import get_bili_cookie
 import argparse
 
 
