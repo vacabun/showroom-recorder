@@ -239,5 +239,5 @@ class RecroderManager:
                     except Exception as e:
                         logging.error('{room_url_key}: {e}'.format(
                             room_url_key=room_url_key, e=e))
-            delay_time = random.uniform(1, 3)
-            time.sleep(delay_time)
+                delay_time = random.uniform(0.1, 0.3)
+                time.sleep(delay_time)
