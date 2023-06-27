@@ -11,19 +11,15 @@ def main():
     parser.add_argument('-k',
                         '--room_url_key',
                         dest='room_url_key')
-    parser.add_argument('-t',
-                        '--time_str',
-                        dest='time_str')
-    parser.add_argument('-n',
-                        '--room_name',
-                        dest='room_name')
+
 
     args = parser.parse_args()
+    time_str  = args.input_file[-19:-4]
 
     uploader = UploaderBili(file_path=args.input_file,
                             room_url_key=args.room_url_key,
-                            room_name=args.room_name,
-                            time_str=args.time_str,
+                            room_name=args.room_url_key,
+                            time_str=time_str,
                             login_cookie=get_bili_cookie('bili_cookie.json'))
     uploader.upload()
 
