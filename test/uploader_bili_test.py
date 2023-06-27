@@ -22,7 +22,7 @@ upload_info_list = [
      'room_url_key': 'LOVE_SANA_MOROHASHI'},
     {'file': '~/workspace/showroom/videos/LOVE_SHOKO_TAKIWAKI_20230627_173017.mp4',
      'room_url_key': 'LOVE_SHOKO_TAKIWAKI'},
-    {'file': '~/workspace/showroom/videos/ME_HITOMI_SUZUKI_20230627_225816.mp4.mp4',
+    {'file': '~/workspace/showroom/videos/ME_HITOMI_SUZUKI_20230627_225816.mp4',
      'room_url_key': 'ME_HITOMI_SUZUKI'},
 
 ]
@@ -47,6 +47,7 @@ def main():
                                 room_name=args.room_url_key,
                                 time_str=time_str,
                                 login_cookie=get_bili_cookie('bili_cookie.json'))
+        uploader.upload()
     else:
         for upload_info in upload_info_list:
             time_str = upload_info['file'][-19:-4]
@@ -56,7 +57,7 @@ def main():
                                     room_name=upload_info['room_url_key'],
                                     time_str=time_str,
                                     login_cookie=get_bili_cookie('bili_cookie.json'))
-    uploader.upload()
+            uploader.upload()
 
 
 if __name__ == '__main__':
