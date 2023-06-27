@@ -28,14 +28,18 @@ class UploaderBili:
         tasks = 3
         dtime = 0
         file_list = [self.file_path]
-        with BiliBili(video) as bili:
-            bili.login("bili.cookie", self.login_cookie)
-            # bili.login_by_password("username", "password")
-            for file in file_list:
-                video_part = bili.upload_file(file, lines=lines, tasks=tasks)
-                video.append(video_part)
-            video.delay_time(dtime)
-            bili.submit()
+        try:
+            with BiliBili(video) as bili:
+                bili.login("bili.cookie", self.login_cookie)
+                # bili.login_by_password("username", "password")
+                for file in file_list:
+                    video_part = bili.upload_file(file, lines=lines, tasks=tasks)
+                    video.append(video_part)
+                video.delay_time(dtime)
+                bili.submit()
+        except Exception as e:
+            logging.error('bilibili upload error: ' + e)
+            raise Exception('bilibili upload error.')
 
 
 class UploaderWebDav:
@@ -57,6 +61,7 @@ class UploaderWebDav:
             client.upload_file(from_path=self.from_path, to_path=self.to_path)
         except Exception as e:
             logging.error('webdav upload error: ' + e)
+            raise Exception('webdav upload error.')
         if self.delete_source_file:
             os.remove(self.from_path)
 
