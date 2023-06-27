@@ -38,7 +38,7 @@ class UploaderBili:
                 video.delay_time(dtime)
                 bili.submit()
         except Exception as e:
-            logging.error('bilibili upload error: ' + e)
+            logging.error('bilibili upload error: ' + str(e))
             raise Exception('bilibili upload error.')
 
 
@@ -60,7 +60,7 @@ class UploaderWebDav:
         try:
             client.upload_file(from_path=self.from_path, to_path=self.to_path)
         except Exception as e:
-            logging.error('webdav upload error: ' + e)
+            logging.error('webdav upload error: ' + str(e))
             raise Exception('webdav upload error.')
         if self.delete_source_file:
             os.remove(self.from_path)
@@ -85,5 +85,5 @@ class UploaderQueue:
                     uploader = self.uploader_queue.get()
                     uploader.upload()
                 except Exception as e:
-                    logging.error('upload error:' + e)
+                    logging.error('upload error:' + str(e))
             time.sleep(10)

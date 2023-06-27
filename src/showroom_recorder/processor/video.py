@@ -271,5 +271,5 @@ class RecroderManager:
                             continue
                         except Exception as e:
                             logging.error('{room_url_key}: {e}'.format(
-                                room_url_key=room_url_key, e=e))
+                                room_url_key=room_url_key, e=str(e)))
             time.sleep(int(self.config['interval']))
