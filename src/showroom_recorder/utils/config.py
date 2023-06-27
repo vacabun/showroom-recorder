@@ -51,22 +51,23 @@ def readRoomsFile(filename):
 def readSettingsFile(filename):
     settingsTxt = """
 [program_settings]
-interval = 10                    # seconds, time interval to check rooms are on live or not
-show_comments = 0                # 1: enable, 0: disable
-show_debug_message = 0           # 1: enable, 0: disable
-save_program_debug_log = 0       # 1: enable, 0: disable
-save_comments_debug_log = 0      # 1: enable, 0: disable
+interval = 10
+show_comments = 0
+show_debug_message = 0
+save_program_debug_log = 0
+save_comments_debug_log = 0
 
 [danmaku_settings]
 width = 640
 height = 360
 font_name = MS PGothic
 font_size = 18
-alpha = 10                       # transparency percentage, a number between 0 and 100
+alpha = 10
 
 [video_settings]
 interval = 10
-upload_webdav = 0                # 1: enable, 0: disable
+upload_webdav = 0
+webdav_delete_source_file = 0
 webdav_url = http://webdav_url
 webdav_username = username
 webdav_password = password

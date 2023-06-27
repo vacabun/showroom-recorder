@@ -191,14 +191,6 @@ class Recorder:
             logging.info('{room_url_key}: video recording finished, saved to {output}.'.format(
                 room_url_key=self.room_url_key, output=self.output))
 
-            if self.config['upload_webdav']:
-                uploader_webdav = UploaderWebDav(self.output,
-                                                 self.output,
-                                                 self.config['webdav_url'],
-                                                 self.config['webdav_username'],
-                                                 self.config['webdav_password'])
-                self.uploader_queue.put(uploader_webdav)
-
             if self.upload_to_bilibili:
                 uploader_bili = UploaderBili(file_path=self.output,
                                              room_url_key=self.room_url_key,
@@ -207,6 +199,15 @@ class Recorder:
                                              login_cookie=get_bili_cookie('bili_cookie.json'))
                 self.uploader_queue.put(uploader_bili)
 
+            if self.config['upload_webdav']:
+                uploader_webdav = UploaderWebDav(self.output,
+                                                 self.output,
+                                                 self.config['webdav_url'],
+                                                 self.config['webdav_username'],
+                                                 self.config['webdav_password'])
+                if(self.config['webdav_delete_source_file']):
+                    uploader_webdav.enable_delete_source_file()
+                self.uploader_queue.put(uploader_webdav)
 
 class RecroderManager:
     def __init__(self, room_url_key_list, config):
@@ -271,4 +272,4 @@ class RecroderManager:
                         except Exception as e:
                             logging.error('{room_url_key}: {e}'.format(
                                 room_url_key=room_url_key, e=e))
-            time.sleep(20)
+            time.sleep(int(self.config['interval']))

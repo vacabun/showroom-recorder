@@ -2,6 +2,7 @@ from queue import Queue
 import logging
 import threading
 import time
+import os
 from webdav4.client import Client
 from biliup.plugins.bili_webup import BiliBili, Data
 
@@ -44,6 +45,10 @@ class UploaderWebDav:
         self.url = url
         self.username = username
         self.password = password
+        self.delete_source_file = False
+        
+    def enable_delete_source_file(self):
+        self.delete_source_file = True
 
     def upload(self):
         logging.info('upload by webdav.')
@@ -52,6 +57,8 @@ class UploaderWebDav:
             client.upload_file(from_path=self.from_path, to_path=self.to_path)
         except Exception as e:
             logging.error('webdav upload error: ' + e)
+        if self.delete_source_file:
+            os.remove(self.from_path)
 
 
 class UploaderQueue:
