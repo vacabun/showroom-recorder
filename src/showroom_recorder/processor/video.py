@@ -230,13 +230,19 @@ class RecroderManager:
                             room_url_key=room_url_key))
                 if self.recorders[i] is None:
                     try:
-                        if get_online_by_roomid(room_id):
+                        is_live = get_online_by_roomid(room_id)
+                    except Exception:
+                        logging.error('{room_url_key}:get online error wait 30s....'.format(
+                            room_url_key=room_url_key))
+                        time.sleep(30)
+                    if is_live:
+                        try:
                             r = Recorder(room_url_key, room_id,
                                          self.uploader_queue, self.config)
                             r.start()
                             self.recorders[i] = r
                             continue
-                    except Exception as e:
-                        logging.error('{room_url_key}: {e}'.format(
-                            room_url_key=room_url_key, e=e))
+                        except Exception as e:
+                            logging.error('{room_url_key}: {e}'.format(
+                                room_url_key=room_url_key, e=e))
             time.sleep(10)
