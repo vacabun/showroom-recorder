@@ -196,7 +196,8 @@ class Recorder:
                                              room_url_key=self.room_url_key,
                                              room_name=self.room_name,
                                              time_str=self.time_str,
-                                             login_cookie=get_bili_cookie('bili_cookie.json'))
+                                             login_cookie=get_bili_cookie('bili_cookie.json'),
+                                             lines=self.config['biliup_lines'])
                 self.uploader_queue.put(uploader_bili)
 
             if self.config['upload_webdav']:

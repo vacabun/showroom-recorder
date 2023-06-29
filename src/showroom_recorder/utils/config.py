@@ -71,7 +71,7 @@ webdav_delete_source_file = 0
 webdav_url = http://webdav_url
 webdav_username = username
 webdav_password = password
-
+biliup_lines = AUTO
 """
     # create file if not present
     path = os.getcwd()

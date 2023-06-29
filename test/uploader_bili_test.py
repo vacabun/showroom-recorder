@@ -4,27 +4,14 @@ import argparse
 
 
 upload_info_list = [
-    {'file': '/home/vacabun/workspace/showroom/videos/LOVE_HANA_OBA_20230627_173116.mp4',
-     'room_url_key': 'LOVE_HANA_OBA'},
-    {'file': '/home/vacabun/workspace/showroom/videos/LOVE_HITOMI_TAKAMATSU_20230627_200125.mp4',
-     'room_url_key': 'LOVE_HITOMI_TAKAMATSU'},
-    {'file': '/home/vacabun/workspace/showroom/videos/LOVE_IORI_NOGUCHI_20230627_173001.mp4',
-     'room_url_key': 'LOVE_IORI_NOGUCHI'},
-    {'file': '/home/vacabun/workspace/showroom/videos/LOVE_KIARA_SAITO_20230627_173101.mp4',
-     'room_url_key': 'LOVE_KIARA_SAITO'},
-    {'file': '/home/vacabun/workspace/showroom/videos/LOVE_MAIKA_SASAKI_20230627_195633.mp4',
-     'room_url_key': 'LOVE_MAIKA_SASAKI'},
-    {'file': '/home/vacabun/workspace/showroom/videos/LOVE_RISA_OTOSHIMA_20230627_200111.mp4',
-     'room_url_key': 'LOVE_RISA_OTOSHIMA'},
-    {'file': '/home/vacabun/workspace/showroom/videos/LOVE_RISA_OTOSHIMA_20230627_234433.mp4',
-     'room_url_key': 'LOVE_RISA_OTOSHIMA'},
-    {'file': '/home/vacabun/workspace/showroom/videos/LOVE_SANA_MOROHASHI_20230627_200154.mp4',
-     'room_url_key': 'LOVE_SANA_MOROHASHI'},
-    {'file': '/home/vacabun/workspace/showroom/videos/LOVE_SHOKO_TAKIWAKI_20230627_173017.mp4',
+    # {'file': '/home/vacabun/workspace/showroom/videos/LOVE_ANNA_YAMAMOTO_20230629_212751.mp4',
+    #  'room_url_key': 'LOVE_ANNA_YAMAMOTO'},
+    {'file': '/home/vacabun/workspace/showroom/videos/LOVE_SHOKO_TAKIWAKI_20230629_225937.mp4',
      'room_url_key': 'LOVE_SHOKO_TAKIWAKI'},
-    {'file': '/home/vacabun/workspace/showroom/videos/ME_HITOMI_SUZUKI_20230627_225816.mp4',
-     'room_url_key': 'ME_HITOMI_SUZUKI'},
-
+    # {'file': '/home/vacabun/workspace/showroom/videos/ME_HITOMI_SUZUKI_20230629_233110.mp4',
+    #  'room_url_key': 'ME_HITOMI_SUZUKI'},
+    # {'file': '/home/vacabun/workspace/showroom/videos/ME_SAYA_TANIZAKI_20230629_232055.mp4',
+    #  'room_url_key': 'ME_SAYA_TANIZAKI'},
 ]
 
 
@@ -46,7 +33,8 @@ def main():
                                 room_url_key=args.room_url_key,
                                 room_name=args.room_url_key,
                                 time_str=time_str,
-                                login_cookie=get_bili_cookie('bili_cookie.json'))
+                                login_cookie=get_bili_cookie('bili_cookie.json'),
+                                lines='AUTO')
         uploader.upload()
     else:
         for upload_info in upload_info_list:

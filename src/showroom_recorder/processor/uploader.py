@@ -8,24 +8,25 @@ from biliup.plugins.bili_webup import BiliBili, Data
 
 
 class UploaderBili:
-    def __init__(self, file_path, room_url_key, room_name, time_str, login_cookie):
+    def __init__(self, file_path, room_url_key, room_name, time_str, login_cookie, lines='AUTO'):
         self.file_path = file_path
         self.room_url_key = room_url_key
         self.room_name = room_name
         self.time_str = time_str
         self.login_cookie = login_cookie
+        self.lines = lines
 
     def upload(self):
         logging.info('upload by biliup.')
         video = Data()
         video.title = self.room_name + ' showroom ' + self.time_str
-        video.desc = self.room_name + ' showroom ' + self.time_str
+        video.desc = ''
         video.source = 'https://www.showroom-live.com/' + self.room_url_key
         video.tid = 137
         video.set_tag(['showroom'])
         video.copyright = 2
-        lines = 'AUTO'
-        tasks = 3
+        lines = self.lines
+        tasks = 32
         dtime = 0
         file_list = [self.file_path]
         try:
