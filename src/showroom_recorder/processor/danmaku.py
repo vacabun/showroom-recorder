@@ -7,6 +7,7 @@ import math
 import random
 import logging
 import logging.handlers
+import csv
 
 from json import JSONDecodeError
 from argparse import ArgumentParser
@@ -431,6 +432,9 @@ class CommentRecorder:
                 else:
                     # replace line break to a space
                     comment = comment.replace('\n', ' ')
+
+                    comment = '[' + data['ac'] + '] ' + comment
+
                     if self.settings['program_settings']['show_comments'] > 0:
                         logging.info('{}: {}'.format(
                             self.room_url_key, comment))
