@@ -47,4 +47,6 @@ showroom-recorder
 
 保存的评论会以字幕形式保存在`comments`文件夹下
 
+[自动上传说明](https://github.com/vacabun/showroom-recorder/blob/main/doc/autoUpBilibili.md)
+
 
