@@ -6,6 +6,8 @@
 
 获得cookie.json文件。
 
+在启动showroom-recorder的目录新建一个文件bili_cookie.json。把上面获取的cookie和token按照下面的格式填进去并且保存。
+
 ```json
 {
     "cookies": {
@@ -15,19 +17,6 @@
         "DedeUserID": ""
     },
     "access_token": ""
-}
-```
-
-在启动showroom-recorder的目录新建一个文件bili.cookie。把上面获取的cookie和token按照下面的格式填进去并且保存。
-
-```json
-{
-    "SESSDATA": "",
-    "bili_jct": "",
-    "DedeUserID__ckMd5": "",
-    "DedeUserID": "",
-    "access_token": "",
-    "refresh_token": null
 }
 ```
 
