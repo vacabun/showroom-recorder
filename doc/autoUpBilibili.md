@@ -2,7 +2,7 @@
 
 ## 1. 设置上传的cookie和token
 
-使用https://github.com/ForgQi/biliup-rs导出cookie和token，参考[https://biliup.github.io/biliup-rs/index.html](https://biliup.github.io/biliup-rs/index.html)。
+使用 https://github.com/ForgQi/biliup-rs 导出cookie和token，参考[https://biliup.github.io/biliup-rs/index.html](https://biliup.github.io/biliup-rs/index.html)。
 
 获得cookie.json文件。
 
