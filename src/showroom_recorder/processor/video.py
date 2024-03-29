@@ -11,6 +11,7 @@ import pytz
 from .uploader import UploaderQueue, UploaderWebDav, UploaderBili
 from ..utils.config import get_bili_cookie, get_biliup_list
 import re
+import m3u8
 
 fake_headers = {
     'Accept': '*/*',
@@ -98,6 +99,7 @@ def get_stream_url_by_roomid(room_id):
     try:
         response = requests.get(url=api_endpoint, headers=fake_headers).text
         response = json.loads(response)
+        # print(response)
         stream_url = response['streaming_url_list'][0]['url']
         for streaming_url in response['streaming_url_list']:
             if streaming_url['type'] == 'hls_all':
@@ -105,6 +107,21 @@ def get_stream_url_by_roomid(room_id):
     except Exception as e:
         raise Exception('get stream url error: ' + e)
     return stream_url
+
+
+def get_max_bandwidth_stream(m3u8_url):
+    playlist = m3u8.load(m3u8_url)
+    stream_dict = {}
+    for stream in playlist.playlists:
+        bandwidth = stream.stream_info.bandwidth
+        stream_url = stream.uri
+        if not stream_url.startswith("http"):
+            base_url = m3u8_url.rsplit("/", 1)[0]
+            stream_url = f"{base_url}/{stream_url}"
+        stream_dict[bandwidth] = stream_url
+        max_bandwidth = max(stream_dict.keys())
+        best_stream_url = stream_dict[max_bandwidth]
+    return stream_dict, max_bandwidth, best_stream_url
 
 
 class Recorder:
@@ -156,6 +173,9 @@ class Recorder:
             stream_url = get_stream_url_by_roomid(self.room_id)
         except Exception as e:
             raise Exception('get stream url error: ' + e)
+        __, __, stream_url = get_max_bandwidth_stream(stream_url)
+        # logging.info('{room_url_key}: stream url is {stream_url}.'.format(
+        #     room_url_key=self.room_url_key, stream_url=stream_url))
 
         self.time_str = get_time_now().strftime('%Y%m%d_%H%M%S')
 
@@ -172,14 +192,17 @@ class Recorder:
         try:
             self.ffmpeg_proc = (
                 ffmpeg
-                .input(stream_url)
+                .input(stream_url, **{'rw_timeout': '10000000'})
                 .output(self.output, **kwargs_dict)
                 .run()
             )
             self.ffmpeg_proc.communicate()
         except Exception as e:
             try:
+                logging.info('{room_url_key}: video recording error, try to stop ffmpeg process.{e}'.format(
+                    room_url_key=self.room_url_key, e=str(e)))
                 self.ffmpeg_proc.stdin.write('q'.encode('utf-8'))
+                self.ffmpeg_proc.stdin.flush()
             except Exception:
                 pass
             self.__download_finish()
@@ -196,7 +219,8 @@ class Recorder:
                                              room_url_key=self.room_url_key,
                                              room_name=self.room_name,
                                              time_str=self.time_str,
-                                             login_cookie=get_bili_cookie('bili_cookie.json'),
+                                             login_cookie=get_bili_cookie(
+                                                 'bili_cookie.json'),
                                              lines=self.config['biliup_lines'])
                 self.uploader_queue.put(uploader_bili)
 
@@ -206,9 +230,10 @@ class Recorder:
                                                  self.config['webdav_url'],
                                                  self.config['webdav_username'],
                                                  self.config['webdav_password'])
-                if(self.config['webdav_delete_source_file']):
+                if (self.config['webdav_delete_source_file']):
                     uploader_webdav.enable_delete_source_file()
                 self.uploader_queue.put(uploader_webdav)
+
 
 class RecroderManager:
     def __init__(self, room_url_key_list, config):

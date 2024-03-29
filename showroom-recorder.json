@@ -16,9 +16,9 @@
         "emoji",
         "pytz",
         "requests",
-        "websocket_client",
         "ffmpeg-python",
         "webdav4",
-        "biliup"
+        "biliup",
+        "m3u8"
     ]
   }
