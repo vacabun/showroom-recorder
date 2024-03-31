@@ -189,11 +189,11 @@ class Recorder:
         kwargs_dict = {'c:v': 'copy',
                        'c:a': 'copy',
                        'bsf:a': 'aac_adtstoasc',
-                       'loglevel': 'error'}
+                       'loglevel': 'info'}
         try:
             self.ffmpeg_proc = (
                 ffmpeg
-                .input(stream_url, **{'rw_timeout': '10000000'})
+                .input(stream_url, **{'rw_timeout': str(30*1000*1000)})
                 .output(self.output, **kwargs_dict)
                 .run()
             )
