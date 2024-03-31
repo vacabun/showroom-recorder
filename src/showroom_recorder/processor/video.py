@@ -110,6 +110,7 @@ def get_stream_url_by_roomid(room_id):
 
 
 def get_max_bandwidth_stream(m3u8_url):
+    best_stream_url = m3u8_url
     playlist = m3u8.load(m3u8_url)
     stream_dict = {}
     for stream in playlist.playlists:
