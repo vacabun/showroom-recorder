@@ -179,11 +179,13 @@ class Recorder:
     def download(self, output_dir='.'):
         try:
             stream_url = get_stream_url_by_roomid(self.room_id)
+            logging.info('{room_url_key}: stream url is {stream_url}.'.format(
+                room_url_key=self.room_url_key, stream_url=stream_url))
         except Exception as e:
             raise Exception('get stream url error: ' + e)
         __, __, stream_url = get_max_bandwidth_stream(stream_url)
-        # logging.info('{room_url_key}: stream url is {stream_url}.'.format(
-        #     room_url_key=self.room_url_key, stream_url=stream_url))
+        logging.info('{room_url_key}: max bandwidth stream url is {stream_url}.'.format(
+            room_url_key=self.room_url_key, stream_url=stream_url))
 
         self.time_str = get_time_now().strftime('%Y%m%d_%H%M%S')
 
