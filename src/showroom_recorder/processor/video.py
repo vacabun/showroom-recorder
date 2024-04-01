@@ -111,17 +111,24 @@ def get_stream_url_by_roomid(room_id):
 
 def get_max_bandwidth_stream(m3u8_url):
     best_stream_url = m3u8_url
-    playlist = m3u8.load(m3u8_url)
     stream_dict = {}
-    for stream in playlist.playlists:
-        bandwidth = stream.stream_info.bandwidth
-        stream_url = stream.uri
-        if not stream_url.startswith("http"):
-            base_url = m3u8_url.rsplit("/", 1)[0]
-            stream_url = f"{base_url}/{stream_url}"
-        stream_dict[bandwidth] = stream_url
-        max_bandwidth = max(stream_dict.keys())
-        best_stream_url = stream_dict[max_bandwidth]
+    max_bandwidth = 0
+
+    try:
+        playlist = m3u8.load(m3u8_url)
+        for stream in playlist.playlists:
+            bandwidth = stream.stream_info.bandwidth
+            stream_url = stream.uri
+            if not stream_url.startswith("http"):
+                base_url = m3u8_url.rsplit("/", 1)[0]
+                stream_url = f"{base_url}/{stream_url}"
+            stream_dict[bandwidth] = stream_url
+            max_bandwidth = max(stream_dict.keys())
+            best_stream_url = stream_dict[max_bandwidth]
+    except Exception as e:
+        logging.error('Analyze m3u8 error:')
+        print(e)
+        pass
     return stream_dict, max_bandwidth, best_stream_url
 
 
@@ -189,7 +196,7 @@ class Recorder:
         kwargs_dict = {'c:v': 'copy',
                        'c:a': 'copy',
                        'bsf:a': 'aac_adtstoasc',
-                       'loglevel': 'info'}
+                       'loglevel': 'error'}
         try:
             self.ffmpeg_proc = (
                 ffmpeg
