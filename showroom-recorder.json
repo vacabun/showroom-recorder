@@ -13,10 +13,8 @@
     ],
 
     "install_requires": [
-        "emoji",
         "pytz",
         "requests",
-        "ffmpeg-python",
         "webdav4",
         "biliup",
         "m3u8"

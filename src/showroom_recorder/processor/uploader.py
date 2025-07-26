@@ -37,7 +37,7 @@ class UploaderBili:
                     video_part = bili.upload_file(file, lines=lines, tasks=tasks)
                     video.append(video_part)
                 video.delay_time(dtime)
-                bili.submit()
+                bili.submit(submit_api="web")
         except Exception as e:
             logging.error('bilibili upload error: ' + str(e))
             raise Exception('bilibili upload error.')
