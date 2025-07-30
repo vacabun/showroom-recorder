@@ -9,7 +9,6 @@ import requests
 import datetime
 import pytz
 from .uploader import UploaderQueue, UploaderWebDav, UploaderBili
-from ..utils.config import get_bili_cookie, get_biliup_list
 import re
 import m3u8
 
@@ -99,7 +98,6 @@ def get_stream_url_by_roomid(room_id):
     try:
         response = requests.get(url=api_endpoint, headers=fake_headers).text
         response = json.loads(response)
-        # print(response)
         stream_url = response['streaming_url_list'][0]['url']
         for streaming_url in response['streaming_url_list']:
             if streaming_url['type'] == 'hls_all':
@@ -127,7 +125,6 @@ def get_max_bandwidth_stream(m3u8_url):
             best_stream_url = stream_dict[max_bandwidth]
     except Exception as e:
         logging.error('Analyze m3u8 error:')
-        print(e)
         pass
     return stream_dict, max_bandwidth, best_stream_url
 
@@ -221,17 +218,24 @@ class Recorder:
 
     def __download_finish(self):
         if os.path.exists(self.output):
-            logging.info('{room_url_key}: video recording finished, saved to {output}.'.format(
-                room_url_key=self.room_url_key, output=self.output))
+            logging.info(f'{self.room_url_key}: video recording finished, saved to {self.output}.')
 
             if self.upload_to_bilibili:
+                login_cookie = {
+                    "cookies": {
+                        "SESSDATA": self.config.biliup.sessdata,
+                        "bili_jct": self.config.biliup.bili_jct,
+                        "DedeUserID__ckMd5": self.config.biliup.DedeUserID__ckMd5,
+                        "DedeUserID": self.config.biliup.DedeUserID
+                    },
+                    "access_token": self.config.biliup.access_token
+                }
                 uploader_bili = UploaderBili(file_path=self.output,
                                              room_url_key=self.room_url_key,
                                              room_name=self.room_name,
                                              time_str=self.time_str,
-                                             login_cookie=get_bili_cookie(
-                                                 'bili_cookie.json'),
-                                             lines=self.config['biliup_lines'])
+                                             login_cookie=login_cookie,
+                                             lines=self.config.biliup.line)
                 self.uploader_queue.put(uploader_bili)
 
             if self.config['upload_webdav']:
@@ -246,26 +250,26 @@ class Recorder:
 
 
 class RecroderManager:
-    def __init__(self, room_url_key_list, config):
-        self.room_url_key_list = room_url_key_list
+    def __init__(self, config):
+        self.room_url_key_list = config.rooms
         self.room_id_list = self.__get_room_id_list()
         self.rooms_num = len(self.room_url_key_list)
         self.recorders = [None] * self.rooms_num
-        self.t = None
+        self.recorder_thread = None
         self._isQuit = False
         self.config = config
         self.uploader_queue = UploaderQueue()
-        self.biliup_list = get_biliup_list('biliup.list')
+        self.biliup_list = config.biliup.rooms
 
     def quit(self):
         self._isQuit = True
-        self.t.join()
+        self.recorder_thread.join()
 
     def start(self):
-        self.t = threading.Thread(target=self.manager)
-        self.t.daemon = True
-        self.t.start()
-        return self.t
+        self.recorder_thread = threading.Thread(target=self.manager)
+        self.recorder_thread.daemon = True
+        self.recorder_thread.start()
+        return self.recorder_thread
 
     def __get_room_id_list(self):
         room_id_list = []
@@ -308,4 +312,4 @@ class RecroderManager:
                         except Exception as e:
                             logging.error('{room_url_key}: {e}'.format(
                                 room_url_key=room_url_key, e=str(e)))
-            time.sleep(int(self.config['interval']))
+            time.sleep(int(self.config.interval))

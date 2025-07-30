@@ -28,16 +28,14 @@ class UploaderBili:
         lines = self.lines
         tasks = 32
         dtime = 0
-        file_list = [self.file_path]
         try:
             with BiliBili(video) as bili:
-                bili.login("bili.cookie", self.login_cookie)
+                bili.login("bili_cookie.json", self.login_cookie)
                 # bili.login_by_password("username", "password")
-                for file in file_list:
-                    video_part = bili.upload_file(file, lines=lines, tasks=tasks)
-                    video.append(video_part)
+                video_part = bili.upload_file(self.file_path, lines=lines, tasks=tasks)
+                video.append(video_part)
                 video.delay_time(dtime)
-                bili.submit()
+                bili.submit(submit_api="web")
         except Exception as e:
             logging.error('bilibili upload error: ' + str(e))
             raise Exception('bilibili upload error.')

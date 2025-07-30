@@ -9,6 +9,5 @@ config.ini
 /build
 /dist
 
-bili_cookie.json
+config.json
 bili.cookie
-biliup.list
