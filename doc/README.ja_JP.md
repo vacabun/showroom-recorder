@@ -20,8 +20,6 @@ pip install showroom-recorder
 sudo apt install ffmpeg
 ```
 
-4. フォント`font/msgothic.ttc`をインストールしてください。（字幕ファイルを使用する場合）
-
 ## 使用方法
 メンバールーム名を引数としてスクリプトを実行します：
 
@@ -29,16 +27,14 @@ sudo apt install ffmpeg
 showroom-recorder -i LOVE_MAIKA_SASAKI
 ```
 
-または、`rooms.ini`ファイルを編集してパラメータなしでスクリプトを直接実行し、初回実行時に自動的に設定ファイルが作成されます。
+または、`config.json`ファイルを編集してパラメータなしでスクリプトを直接実行し、初回実行時に自動的に設定ファイルが作成されます。
 
 > showroom ライブ配信アドレス: "https://www.showroom-live.com/ROOM_URL_KEY"
 
-> 最後の部分のルーム名をコピーして、`rooms.ini`ファイルに貼り付けてください。
-
-> 複数のルーム名を改行して入力し、#でコメントしてください。
+> 最後の部分のルーム名をコピーして、`rooms`に貼り付けてください。
 
 ``` shell
 showroom-recorder
 ```
 
-録画されたビデオは`save`フォルダーに保存され、コメントは字幕形式で`comments`フォルダーに保存されます。
+録画されたビデオは`videos`フォルダーに保存されます。

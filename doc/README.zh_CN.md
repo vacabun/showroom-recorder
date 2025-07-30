@@ -31,21 +31,17 @@ sudo apt install ffmpeg
 showroom-recorder -i LOVE_MAIKA_SASAKI
 ```
 
-或者修改`rooms.ini`文件不加参数直接运行脚本，首次运行将会自动创建配置文件。
+或者修改`config.json`文件不加参数直接运行脚本，首次运行将会自动创建配置文件。
 
 > showroom 直播地址为 "https://www.showroom-live.com/ROOM_URL_KEY"
 
-> 请复制最后一段房间名并且粘贴到`rooms.ini`文件中
-
-> 多个房间名换行输入，使用#注释
+> 请复制最后一段房间名并且粘贴到`rooms`中
 
 ``` shell
 showroom-recorder
 ```
 
-录制的视频将会被存储在`save`文件夹下
-
-保存的评论会以字幕形式保存在`comments`文件夹下
+录制的视频将会被存储在`videos`文件夹下
 
 [自动上传说明](https://github.com/vacabun/showroom-recorder/blob/main/doc/autoUpBilibili.md)
 
