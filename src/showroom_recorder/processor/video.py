@@ -180,9 +180,10 @@ class Recorder:
                 room_url_key=self.room_url_key, stream_url=stream_url))
         except Exception as e:
             raise Exception('get stream url error: ' + e)
-        __, __, stream_url = get_max_bandwidth_stream(stream_url)
-        logging.info('{room_url_key}: max bandwidth stream url is {stream_url}.'.format(
-            room_url_key=self.room_url_key, stream_url=stream_url))
+        if (self.config.best_quality):
+            __, __, stream_url = get_max_bandwidth_stream(stream_url)
+            logging.info('{room_url_key}: max bandwidth stream url is {stream_url}.'.format(
+                room_url_key=self.room_url_key, stream_url=stream_url))
 
         self.time_str = get_time_now().strftime('%Y%m%d_%H%M%S')
 
@@ -221,20 +222,10 @@ class Recorder:
             logging.info(f'{self.room_url_key}: video recording finished, saved to {self.output}.')
 
             if self.upload_to_bilibili:
-                login_cookie = {
-                    "cookies": {
-                        "SESSDATA": self.config.biliup.sessdata,
-                        "bili_jct": self.config.biliup.bili_jct,
-                        "DedeUserID__ckMd5": self.config.biliup.DedeUserID__ckMd5,
-                        "DedeUserID": self.config.biliup.DedeUserID
-                    },
-                    "access_token": self.config.biliup.access_token
-                }
                 uploader_bili = UploaderBili(file_path=self.output,
                                              room_url_key=self.room_url_key,
                                              room_name=self.room_name,
                                              time_str=self.time_str,
-                                             login_cookie=login_cookie,
                                              lines=self.config.biliup.line)
                 self.uploader_queue.put(uploader_bili)
 

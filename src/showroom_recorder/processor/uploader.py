@@ -8,12 +8,11 @@ from biliup.plugins.bili_webup import BiliBili, Data
 
 
 class UploaderBili:
-    def __init__(self, file_path, room_url_key, room_name, time_str, login_cookie, lines='AUTO'):
+    def __init__(self, file_path, room_url_key, room_name, time_str, lines='AUTO'):
         self.file_path = file_path
         self.room_url_key = room_url_key
         self.room_name = room_name
         self.time_str = time_str
-        self.login_cookie = login_cookie
         self.lines = lines
 
     def upload(self):
@@ -30,8 +29,7 @@ class UploaderBili:
         dtime = 0
         try:
             with BiliBili(video) as bili:
-                bili.login("bili_cookie.json", self.login_cookie)
-                # bili.login_by_password("username", "password")
+                bili.login(persistence_path='', user_cookie = 'cookies.json')
                 video_part = bili.upload_file(self.file_path, lines=lines, tasks=tasks)
                 video.append(video_part)
                 video.delay_time(dtime)

@@ -6,6 +6,8 @@ configTempTxt = """
 {
     "interval": 10,
     "debug": false,
+    "best_quality": true,
+    "rooms":[],
     "webdav": {
         "upload": false,
         "url": "",
@@ -13,15 +15,9 @@ configTempTxt = """
         "password": "",
         "delete_source_file": false
     },
-    "rooms":[],
     "biliup": {
         "rooms":[],
-        "line": "AUTO",
-        "sessdata": "",
-        "bili_jct": "",
-        "DedeUserID__ckMd5": "",
-        "DedeUserID": "",
-        "access_token": ""
+        "line": "AUTO"
     }
 }
 
@@ -41,11 +37,6 @@ class BiliupConfig:
     def __init__(self):
         self.rooms = []
         self.line = "AUTO"
-        self.sessdata = ""
-        self.bili_jct = ""
-        self.DedeUserID__ckMd5 = ""
-        self.DedeUserID = ""
-        self.access_token = ""
 
 
 class Config:
@@ -55,6 +46,7 @@ class Config:
         self.webdav = WebdavConfig()
         self.rooms = []
         self.biliup = BiliupConfig()
+        self.best_quality = True
 
     def LoadConfig(self, fileName):
         # create file if not present
@@ -68,19 +60,16 @@ class Config:
             config = json.load(f)
             self.interval = config["interval"]
             self.debug = config["debug"]
+            self.rooms = config["rooms"]
+            self.best_quality = config["best_quality"]
             self.webdav.upload = config["webdav"]["upload"]
             self.webdav.url = config["webdav"]["url"]
             self.webdav.username = config["webdav"]["username"]
             self.webdav.password = config["webdav"]["password"]
             self.webdav.delete_source_file = config["webdav"]["delete_source_file"]
-            self.rooms = config["rooms"]
             self.biliup.rooms = config["biliup"]["rooms"]
             self.biliup.line = config["biliup"]["line"]
-            self.biliup.sessdata = config["biliup"]["sessdata"]
-            self.biliup.bili_jct = config["biliup"]["bili_jct"]
-            self.biliup.DedeUserID__ckMd5 = config["biliup"]["DedeUserID__ckMd5"]
-            self.biliup.DedeUserID = config["biliup"]["DedeUserID"]
-            self.biliup.access_token = config["biliup"]["access_token"]
+            
             
 
 
