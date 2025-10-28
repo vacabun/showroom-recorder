@@ -46,8 +46,11 @@ def showroom_get_roomid_by_room_url_key(room_url_key):
 def get_online_by_liveinfo(liveinfo):
     if liveinfo['live_status'] == 2:
         return True
-    else:
+    elif liveinfo['live_status'] == 1:
         return False
+    else:
+        logging.error(f'Unknow live stats: {liveinfo['live_status']}')
+        return True
 
 
 def get_liveinfo_by_roomid(room_id):
