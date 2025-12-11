@@ -6,8 +6,6 @@ configTempTxt = """
 {
     "interval": 10,
     "debug": false,
-    "best_quality": true,
-    "rooms":[],
     "webdav": {
         "upload": false,
         "url": "",
@@ -15,9 +13,16 @@ configTempTxt = """
         "password": "",
         "delete_source_file": false
     },
+    "best_quality": true,
+    "rooms":[""],
     "biliup": {
-        "rooms":[],
-        "line": "AUTO"
+        "rooms":[""],
+        "line": "AUTO",
+        "sessdata": "",
+        "bili_jct": "",
+        "DedeUserID__ckMd5": "",
+        "DedeUserID": "",
+        "access_token": ""
     }
 }
 
