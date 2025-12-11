@@ -49,7 +49,7 @@ def get_online_by_liveinfo(liveinfo):
     elif liveinfo['live_status'] == 1:
         return False
     else:
-        logging.error(f'Unknow live stats: {liveinfo['live_status']}')
+        logging.error(f"Unknow live stats: {liveinfo['live_status']}")
         return True
 
 
