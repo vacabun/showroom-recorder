@@ -1,48 +1,39 @@
 # showroom-recorder
-一个用于录制SHOWROOM视频的脚本
+一个用于录制 SHOWROOM 直播视频的脚本。
 
 [![zh_CN](https://img.shields.io/badge/language-zh__CN-green.svg)](https://github.com/vacabun/showroom-recorder/blob/main/doc/README.zh_CN.md)
 [![en_US](https://img.shields.io/badge/language-en__US-green.svg)](https://github.com/vacabun/showroom-recorder/blob/main/doc/README.en_US.md)
 [![ja_JP](https://img.shields.io/badge/language-ja__JP-green.svg)](https://github.com/vacabun/showroom-recorder/blob/main/doc/README.ja_JP.md)
 
+## 安装
 
-## Installation
-1.安装python3。
-
-2.安装python环境。
-
-``` shell
+```bash
 pip install showroom-recorder
-```
-
-2.安装ffmpeg。
-
-``` shell
 sudo apt install ffmpeg
 ```
 
-4.安装字体`font/msgothic.ttc` (如果需要使用字幕文件)
+## 配置
 
+程序会读取当前目录下的 `config.json`。仓库里提供了干净的 `config.example.json` 作为参考。
 
-## Usage
-使用方法为直接将成员房间名作为参数运行脚本：
+showroom 直播地址格式如下：
 
-``` shell
-showroom-recorder -i LOVE_MAIKA_SASAKI
+```text
+https://www.showroom-live.com/ROOM_URL_KEY
 ```
 
-或者修改`config.json`文件不加参数直接运行脚本，首次运行将会自动创建配置文件。
+把最后一段 `ROOM_URL_KEY` 填到 `rooms` 里即可。
 
-> showroom 直播地址为 "https://www.showroom-live.com/ROOM_URL_KEY"
+如果需要自动上传到 Bilibili，请把 `cookies.json` 放到运行目录，并在 `biliup.rooms` 中列出需要自动投稿的房间。
 
-> 请复制最后一段房间名并且粘贴到`rooms`中
+## 使用
 
-``` shell
+```bash
+showroom-recorder -i LOVE_MAIKA_SASAKI
 showroom-recorder
 ```
 
-录制的视频将会被存储在`videos`文件夹下
+录制的视频会存放在 `videos/` 下。
 
 [自动上传说明](https://github.com/vacabun/showroom-recorder/blob/main/doc/autoUpBilibili.md)
-
 

@@ -1,5 +1,6 @@
 # showroom-recorder
-A Script for Recording Showroom Streaming Video
+
+Record SHOWROOM live streams, optionally upload finished videos, and publish releases to PyPI with GitHub Actions.
 
 [![zh_CN](https://img.shields.io/badge/language-zh__CN-green.svg)](https://github.com/vacabun/showroom-recorder/blob/main/doc/README.zh_CN.md)
 [![en_US](https://img.shields.io/badge/language-en__US-green.svg)](https://github.com/vacabun/showroom-recorder/blob/main/doc/README.en_US.md)
@@ -7,40 +8,71 @@ A Script for Recording Showroom Streaming Video
 
 ## Installation
 
-1. Install the python3.
+Install the package:
 
-2. Install requirements.
-
-``` shell
+```bash
 pip install showroom-recorder
 ```
 
-3. Install ffmpeg
+Install `ffmpeg` separately:
 
-``` shell
+```bash
 sudo apt install ffmpeg
 ```
 
+## Configuration
+
+The app reads `config.json` from the current working directory. On first run it creates a default config automatically, but the repository also includes [config.example.json](./config.example.json) as a clean reference.
+
+Typical setup:
+
+1. Copy `config.example.json` to `config.json`.
+2. Put the SHOWROOM room URL keys you want to monitor into `rooms`.
+3. If you want Bilibili uploads, add the room keys to `biliup.rooms`.
+4. If you want WebDAV uploads, enable `webdav.upload` and fill in the connection settings.
+
+The SHOWROOM live URL format is:
+
+```text
+https://www.showroom-live.com/ROOM_URL_KEY
+```
+
+Use the last path segment as the room key.
+
+For Bilibili uploads, place your exported `cookies.json` next to `config.json`. Sensitive tokens and cookies should stay in local files, not in Git.
+
 ## Usage
 
-Directly input the member room name as a parameter:
+Monitor a single room directly:
 
-``` shell
+```bash
 showroom-recorder -i LOVE_MAIKA_SASAKI
 ```
 
-Or modify the config.json file，and run without parameter. 
+Or run with the rooms configured in `config.json`:
 
-The configuration file will be automatically created on the first run.
-
-> The SHOWROOM live address is "https://www.showroom-live.com/ROOM_URL_KEY".
-
-> Please copy the last segment of the room name and paste it into the rooms list.
-
-
-``` shell
+```bash
 showroom-recorder
 ```
 
-The recorded video will be stored in the videos folder.
+Recorded videos are written to `videos/`.
 
+## Development
+
+Common commands:
+
+```bash
+make clean
+make build
+make reinstall
+make release VERSION=0.7.16
+```
+
+Development notes and release flow are documented in [doc/DEVELOPMENT.md](./doc/DEVELOPMENT.md).
+
+## Documentation
+
+- Chinese: [doc/README.zh_CN.md](./doc/README.zh_CN.md)
+- English: [doc/README.en_US.md](./doc/README.en_US.md)
+- Japanese: [doc/README.ja_JP.md](./doc/README.ja_JP.md)
+- Bilibili upload notes: [doc/autoUpBilibili.md](./doc/autoUpBilibili.md)

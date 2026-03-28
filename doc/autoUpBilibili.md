@@ -1,16 +1,36 @@
-# showroom-recorder自动上传
+# showroom-recorder 自动上传
 
-## 1. 设置上传的cookie和token
+## 1. 准备上传登录信息
 
-使用 https://github.com/ForgQi/biliup-rs 导出cookie和token，参考[https://biliup.github.io/biliup-rs/index.html](https://biliup.github.io/biliup-rs/index.html)。
+使用 https://github.com/ForgQi/biliup-rs 导出登录信息，参考 [https://biliup.github.io/biliup-rs/index.html](https://biliup.github.io/biliup-rs/index.html)。
 
-获得cookie.json文件。
+导出后得到 `cookies.json`，把它放在运行 `showroom-recorder` 的目录中。
 
-把cookie.json文件放在启动showroom-recorder的目录
+不要把登录信息写进仓库，也不要提交 `cookies.json`。
 
-## 2. 配置想要上传的房间
+## 2. 配置要上传的房间
 
-上面的都设置了也不会开始上传，还需要指定上传的房间名，（为了设置部分房间投稿部分不投稿）。
+只有在 `config.json` 的 `biliup.rooms` 里列出的房间，录制完成后才会自动投稿。
 
-和配置录制房间的方法一样，在config.json配置文件中的biliup.rooms里面添加想要上传的房间
+示例：
 
+```json
+{
+    "biliup": {
+        "rooms": ["LOVE_MAIKA_SASAKI"],
+        "line": "AUTO"
+    }
+}
+```
+
+`line` 默认可以保持 `AUTO`。
+
+## 3. 运行方式
+
+正常运行录制程序即可：
+
+```bash
+showroom-recorder
+```
+
+当录制的房间命中 `biliup.rooms` 配置时，程序会在录制结束后尝试使用本地 `cookies.json` 上传。

@@ -1,40 +1,36 @@
 # showroom-recorder
-SHOWROOMビデオを録画するためのスクリプト
+SHOWROOM 配信を録画するためのスクリプトです。
 
 [![zh_CN](https://img.shields.io/badge/language-zh__CN-green.svg)](https://github.com/vacabun/showroom-recorder/blob/main/doc/README.zh_CN.md)
 [![en_US](https://img.shields.io/badge/language-en__US-green.svg)](https://github.com/vacabun/showroom-recorder/blob/main/doc/README.en_US.md)
 [![ja_JP](https://img.shields.io/badge/language-ja__JP-green.svg)](https://github.com/vacabun/showroom-recorder/blob/main/doc/README.ja_JP.md)
 
-## インストール方法
-1. python3をインストールしてください。
+## インストール
 
-2. python環境をインストールしてください。
-
-``` shell
+```bash
 pip install showroom-recorder
-```
-
-3. ffmpegをインストールしてください。
-
-``` shell
 sudo apt install ffmpeg
 ```
 
-## 使用方法
-メンバールーム名を引数としてスクリプトを実行します：
+## 設定
 
-``` shell
-showroom-recorder -i LOVE_MAIKA_SASAKI
+アプリはカレントディレクトリの `config.json` を読み込みます。リポジトリには `config.example.json` もあります。
+
+SHOWROOM の配信 URL は次の形式です。
+
+```text
+https://www.showroom-live.com/ROOM_URL_KEY
 ```
 
-または、`config.json`ファイルを編集してパラメータなしでスクリプトを直接実行し、初回実行時に自動的に設定ファイルが作成されます。
+最後の `ROOM_URL_KEY` を `rooms` に設定してください。
 
-> showroom ライブ配信アドレス: "https://www.showroom-live.com/ROOM_URL_KEY"
+Bilibili へ自動投稿する場合は、`cookies.json` を実行ディレクトリに置き、対象ルームを `biliup.rooms` に追加してください。
 
-> 最後の部分のルーム名をコピーして、`rooms`に貼り付けてください。
+## 使い方
 
-``` shell
+```bash
+showroom-recorder -i LOVE_MAIKA_SASAKI
 showroom-recorder
 ```
 
-録画されたビデオは`videos`フォルダーに保存されます。
+録画ファイルは `videos/` に保存されます。

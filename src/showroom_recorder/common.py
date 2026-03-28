@@ -1,72 +1,86 @@
 #!/usr/bin/env python3
 
-import logging
 import argparse
-import time
+import logging
 
-from .utils import load_config
-from .processor import video
+from .processor.video import RecorderManager
+from .utils.load_config import Config
 
 
-def main():
-    config = load_config.Config()
-    config.LoadConfig("config.json")
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Download SHOWROOM live streams.")
+    parser.add_argument(
+        "-i",
+        "--id",
+        dest="room_id",
+        metavar="SHOWROOM_ID",
+        help='Only monitor one SHOWROOM room URL key. For multiple rooms, edit "config.json".',
+    )
+    return parser
 
-    # config logging
-    log = logging.getLogger()
-    log.setLevel(logging.INFO)
-    consoleHandler = logging.StreamHandler()
-    consoleFmt = logging.Formatter(
-        fmt='%(asctime)s %(message)s', datefmt='%H:%M:%S')
-    consoleHandler.setFormatter(consoleFmt)
-    if config.debug:
-        consoleHandler.setLevel(logging.DEBUG)
-    else:
-        consoleHandler.setLevel(logging.INFO)
-    log.addHandler(consoleHandler)
 
-    # config ArgumentParser
-    parser = argparse.ArgumentParser(
-        description='download showroom video.')
-    parser.add_argument('-i', '--id', help='Only monitor this one showroom id. \
-                For more rooms, please edit file "config.json".', metavar='SHOWROOM_ID', dest='roomId')
+def configure_logging(debug: bool) -> logging.Logger:
+    logging.basicConfig(
+        level=logging.DEBUG if debug else logging.INFO,
+        format="%(asctime)s %(message)s",
+        datefmt="%H:%M:%S",
+        force=True,
+    )
+    return logging.getLogger()
 
-    # handle args
-    args = parser.parse_args()
-    if args.roomId:
-        roomNum = 1
-        config.rooms = [args.roomId]
-        log.info(f'Monitoring {args.roomId} ...')
-    else:
-        roomNum = len(config.rooms)
-        if roomNum == 0:
-            log.info('No rooms to monitor')
-        else:
-            log.info(f'Monitoring {roomNum} rooms...')
 
-    videoRecroderManager = video.RecroderManager(config)
-    videoRecroderManager.start()
+def resolve_rooms(config: Config, room_id: str | None, log: logging.Logger) -> list[str]:
+    if room_id:
+        config.rooms = [room_id]
+        log.info("Monitoring %s ...", room_id)
+        return config.rooms
 
-    helptxt = '''
-    Commands:
-    - Type "h" or "help" for help.
-    - Type "q" or "quit" to quit.
-    '''
+    if not config.rooms:
+        log.info("No rooms to monitor.")
+        return []
+
+    log.info("Monitoring %s rooms...", len(config.rooms))
+    return config.rooms
+
+
+def command_loop(manager: RecorderManager, log: logging.Logger) -> None:
+    help_text = (
+        "Commands:\n"
+        '- Type "h" or "help" for help.\n'
+        '- Type "q", "quit", or "exit" to quit.'
+    )
 
     while True:
         try:
             line = input().strip().lower()
-        except KeyboardInterrupt:  # Ctrl-C is pressed
-            log.info('KeyboardInterrupt')
+        except EOFError:
             break
-        if line == 'q' or line == 'quit' or line == 'exit':
+        except KeyboardInterrupt:
+            log.info("KeyboardInterrupt")
             break
-        elif line == 'h' or line == 'help':
-            log.info(helptxt)
-        else:
-            log.info('Unknown command. Type "h" or "help" for help.')
-        time.sleep(0.1)
 
-    log.info('quitting jobs...')
-    videoRecroderManager.quit()
+        if line in {"q", "quit", "exit"}:
+            break
+        if line in {"h", "help"}:
+            log.info(help_text)
+            continue
+        if line:
+            log.info('Unknown command. Type "h" or "help" for help.')
+
+    log.info("quitting jobs...")
+    manager.quit()
     log.info("bye")
+
+
+def main() -> None:
+    config = Config().load_config("config.json")
+    args = build_parser().parse_args()
+    log = configure_logging(config.debug)
+
+    rooms = resolve_rooms(config, args.room_id, log)
+    if not rooms:
+        return
+
+    recorder_manager = RecorderManager(config)
+    recorder_manager.start()
+    command_loop(recorder_manager, log)

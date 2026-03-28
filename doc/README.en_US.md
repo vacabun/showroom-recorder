@@ -1,5 +1,5 @@
 # showroom-recorder
-A Script for Recording Showroom Streaming Video
+Record SHOWROOM live streams from the command line.
 
 [![zh_CN](https://img.shields.io/badge/language-zh__CN-green.svg)](https://github.com/vacabun/showroom-recorder/blob/main/doc/README.zh_CN.md)
 [![en_US](https://img.shields.io/badge/language-en__US-green.svg)](https://github.com/vacabun/showroom-recorder/blob/main/doc/README.en_US.md)
@@ -7,38 +7,28 @@ A Script for Recording Showroom Streaming Video
 
 ## Installation
 
-1.Install the python3.
-
-2.Install requirements.
-
-``` shell
+```bash
 pip install showroom-recorder
-```
-
-3.Install ffmpeg
-
-``` shell
 sudo apt install ffmpeg
 ```
 
-## Usage
+## Configuration
 
-Directly input the member room name as a parameter:
+The app reads `config.json` from the current working directory. A clean example is available in `config.example.json`.
 
-``` shell
-showroom-recorder -i LOVE_MAIKA_SASAKI
+The SHOWROOM room key comes from the last segment of:
+
+```text
+https://www.showroom-live.com/ROOM_URL_KEY
 ```
 
-Or modify the config.json file，and run without parameter. 
+Put the room keys in `rooms`. For automatic Bilibili uploads, place `cookies.json` next to `config.json` and list the upload targets in `biliup.rooms`.
 
-The configuration file will be automatically created on the first run.
+## Usage
 
-> The SHOWROOM live address is "https://www.showroom-live.com/ROOM_URL_KEY".
-
-> Please copy the last segment of the room name and paste it into the rooms list.
-
-``` shell
+```bash
+showroom-recorder -i LOVE_MAIKA_SASAKI
 showroom-recorder
 ```
 
-The recorded video will be stored in the videos folder.
+Recorded videos are stored in `videos/`.

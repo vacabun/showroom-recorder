@@ -1,83 +1,116 @@
-import os
-import logging
-import json
+from __future__ import annotations
 
-configTempTxt = """
-{
+import json
+import logging
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any
+
+
+CONFIG_TEMPLATE = {
     "interval": 10,
-    "debug": false,
+    "debug": False,
     "webdav": {
-        "upload": false,
+        "upload": False,
         "url": "",
         "username": "",
         "password": "",
-        "delete_source_file": false
+        "delete_source_file": False,
     },
-    "best_quality": true,
-    "rooms":[""],
+    "best_quality": True,
+    "rooms": [""],
     "biliup": {
-        "rooms":[""],
+        "rooms": [""],
         "line": "AUTO",
-        "sessdata": "",
-        "bili_jct": "",
-        "DedeUserID__ckMd5": "",
-        "DedeUserID": "",
-        "access_token": ""
-    }
+    },
 }
 
-"""
+
+def _normalize_room_list(rooms: list[Any] | None) -> list[str]:
+    if not rooms:
+        return []
+    return [str(room).strip() for room in rooms if str(room).strip()]
 
 
+@dataclass
 class WebdavConfig:
-    def __init__(self):
-        self.upload = False
-        self.url = "",
-        self.username = ""
-        self.password = ""
-        self.delete_source_file = False
+    upload: bool = False
+    url: str = ""
+    username: str = ""
+    password: str = ""
+    delete_source_file: bool = False
+
+    @classmethod
+    def from_mapping(cls, payload: dict[str, Any] | None) -> "WebdavConfig":
+        payload = payload or {}
+        return cls(
+            upload=bool(payload.get("upload", False)),
+            url=str(payload.get("url", "")),
+            username=str(payload.get("username", "")),
+            password=str(payload.get("password", "")),
+            delete_source_file=bool(payload.get("delete_source_file", False)),
+        )
 
 
+@dataclass
 class BiliupConfig:
-    def __init__(self):
-        self.rooms = []
-        self.line = "AUTO"
+    rooms: list[str] = field(default_factory=list)
+    line: str = "AUTO"
+
+    @classmethod
+    def from_mapping(cls, payload: dict[str, Any] | None) -> "BiliupConfig":
+        payload = payload or {}
+        return cls(
+            rooms=_normalize_room_list(payload.get("rooms")),
+            line=str(payload.get("line", "AUTO") or "AUTO"),
+        )
 
 
+@dataclass
 class Config:
-    def __init__(self):
-        self.interval = 10
-        self.debug = False
-        self.webdav = WebdavConfig()
-        self.rooms = []
-        self.biliup = BiliupConfig()
-        self.best_quality = True
+    interval: int = 10
+    debug: bool = False
+    webdav: WebdavConfig = field(default_factory=WebdavConfig)
+    rooms: list[str] = field(default_factory=list)
+    biliup: BiliupConfig = field(default_factory=BiliupConfig)
+    best_quality: bool = True
 
-    def LoadConfig(self, fileName):
-        # create file if not present
-        filePath = os.path.join(os.getcwd(), fileName)
-        if not os.path.isfile(filePath):
-            with open(filePath, 'w', encoding='utf8') as fp:
-                fp.write(configTempTxt)
-            logging.info(f'File {filePath} is not exist, create it.')
+    @classmethod
+    def from_mapping(cls, payload: dict[str, Any]) -> "Config":
+        return cls(
+            interval=max(1, int(payload.get("interval", 10))),
+            debug=bool(payload.get("debug", False)),
+            webdav=WebdavConfig.from_mapping(payload.get("webdav")),
+            rooms=_normalize_room_list(payload.get("rooms")),
+            biliup=BiliupConfig.from_mapping(payload.get("biliup")),
+            best_quality=bool(payload.get("best_quality", True)),
+        )
 
-        with open(filePath, 'r', encoding='utf-8') as f:
-            config = json.load(f)
-            self.interval = config["interval"]
-            self.debug = config["debug"]
-            self.rooms = config["rooms"]
-            self.best_quality = config["best_quality"]
-            self.webdav.upload = config["webdav"]["upload"]
-            self.webdav.url = config["webdav"]["url"]
-            self.webdav.username = config["webdav"]["username"]
-            self.webdav.password = config["webdav"]["password"]
-            self.webdav.delete_source_file = config["webdav"]["delete_source_file"]
-            self.biliup.rooms = config["biliup"]["rooms"]
-            self.biliup.line = config["biliup"]["line"]
-            
-            
+    def load_config(self, file_name: str) -> "Config":
+        file_path = Path.cwd() / file_name
+        self._ensure_config_exists(file_path)
 
+        with file_path.open("r", encoding="utf-8") as file_obj:
+            payload = json.load(file_obj)
 
+        loaded = self.from_mapping(payload)
+        self.interval = loaded.interval
+        self.debug = loaded.debug
+        self.webdav = loaded.webdav
+        self.rooms = loaded.rooms
+        self.biliup = loaded.biliup
+        self.best_quality = loaded.best_quality
+        return self
 
+    def LoadConfig(self, fileName: str) -> "Config":
+        return self.load_config(fileName)
 
+    @staticmethod
+    def _ensure_config_exists(file_path: Path) -> None:
+        if file_path.is_file():
+            return
 
+        with file_path.open("w", encoding="utf-8") as file_obj:
+            json.dump(CONFIG_TEMPLATE, file_obj, indent=4, ensure_ascii=False)
+            file_obj.write("\n")
+        logging.info("File %s does not exist, created with defaults.", file_path)

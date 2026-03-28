@@ -1,0 +1,21 @@
+{
+    "interval": 10,
+    "debug": false,
+    "webdav": {
+        "upload": false,
+        "url": "",
+        "username": "",
+        "password": "",
+        "delete_source_file": false
+    },
+    "best_quality": true,
+    "rooms": [
+        "LOVE_MAIKA_SASAKI"
+    ],
+    "biliup": {
+        "rooms": [
+            "LOVE_MAIKA_SASAKI"
+        ],
+        "line": "AUTO"
+    }
+}
