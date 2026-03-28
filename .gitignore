@@ -21,4 +21,6 @@ rooms.ini
 config.ini
 config.json
 *cookies.json
+upload_failures.jsonl
+upload_successes.jsonl
 bili.cookie

@@ -34,3 +34,27 @@ showroom-recorder
 ```
 
 当录制的房间命中 `biliup.rooms` 配置时，程序会在录制结束后尝试使用本地 `cookies.json` 上传。
+
+如果上传连续失败，程序会把失败任务写到当前目录下的 `upload_failures.jsonl`，方便后续排查或补传。
+
+## 4. 手动补传失败任务
+
+补传全部失败任务：
+
+```bash
+showroom-recorder --retry-failed-uploads
+```
+
+只补传 Bilibili 失败任务：
+
+```bash
+showroom-recorder --retry-failed-uploads --retry-failed-uploads-target bilibili
+```
+
+只补传单个文件：
+
+```bash
+showroom-recorder --retry-failed-uploads --retry-failed-uploads-file videos/LOVE_MAIKA_SASAKI_20260328_120000.mp4
+```
+
+补传成功后，对应失败记录会从 `upload_failures.jsonl` 中移除。

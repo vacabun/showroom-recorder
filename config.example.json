@@ -17,5 +17,6 @@
             "LOVE_MAIKA_SASAKI"
         ],
         "line": "AUTO"
-    }
+    },
+    "cleanup_uploaded_videos_after_hours": 0
 }

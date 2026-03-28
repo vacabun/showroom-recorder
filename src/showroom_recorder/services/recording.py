@@ -107,6 +107,11 @@ class Recorder:
             return
 
         logging.info("%s: video saved to %s.", self.room_url_key, self.output)
+        expected_targets = []
+        if self.upload_to_bilibili:
+            expected_targets.append("bilibili")
+        if self.config.webdav.upload:
+            expected_targets.append("webdav")
 
         if self.upload_to_bilibili:
             self.uploader_queue.put(
@@ -116,6 +121,7 @@ class Recorder:
                     room_name=self.room_name,
                     time_str=self.time_str,
                     lines=self.config.biliup.line,
+                    expected_targets=expected_targets,
                 )
             )
 
@@ -126,6 +132,7 @@ class Recorder:
                 url=self.config.webdav.url,
                 username=self.config.webdav.username,
                 password=self.config.webdav.password,
+                expected_targets=expected_targets,
             )
             if self.config.webdav.delete_source_file:
                 uploader_webdav.enable_delete_source_file()

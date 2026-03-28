@@ -23,6 +23,7 @@ CONFIG_TEMPLATE = {
         "rooms": [""],
         "line": "AUTO",
     },
+    "cleanup_uploaded_videos_after_hours": 0,
 }
 
 
@@ -74,6 +75,7 @@ class Config:
     rooms: list[str] = field(default_factory=list)
     biliup: BiliupConfig = field(default_factory=BiliupConfig)
     best_quality: bool = True
+    cleanup_uploaded_videos_after_hours: int = 0
 
     @classmethod
     def from_mapping(cls, payload: dict[str, Any]) -> "Config":
@@ -84,6 +86,9 @@ class Config:
             rooms=_normalize_room_list(payload.get("rooms")),
             biliup=BiliupConfig.from_mapping(payload.get("biliup")),
             best_quality=bool(payload.get("best_quality", True)),
+            cleanup_uploaded_videos_after_hours=max(
+                0, int(payload.get("cleanup_uploaded_videos_after_hours", 0))
+            ),
         )
 
     def load_config(self, file_name: str) -> "Config":
@@ -100,6 +105,7 @@ class Config:
         self.rooms = loaded.rooms
         self.biliup = loaded.biliup
         self.best_quality = loaded.best_quality
+        self.cleanup_uploaded_videos_after_hours = loaded.cleanup_uploaded_videos_after_hours
         return self
 
     def LoadConfig(self, fileName: str) -> "Config":

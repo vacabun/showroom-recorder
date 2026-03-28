@@ -4,6 +4,7 @@ import argparse
 import logging
 
 from .processor.video import RecorderManager
+from .services.uploading import UploadFailureLog
 from .utils.load_config import Config
 
 
@@ -16,6 +17,21 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="SHOWROOM_ID",
         help='Only monitor one SHOWROOM room URL key. For multiple rooms, edit "config.json".',
     )
+    parser.add_argument(
+        "--retry-failed-uploads",
+        action="store_true",
+        help="Retry tasks recorded in upload_failures.jsonl, remove succeeded entries, then exit.",
+    )
+    parser.add_argument(
+        "--retry-failed-uploads-target",
+        choices=["bilibili", "webdav"],
+        help="Only retry failed uploads for one target. Use with --retry-failed-uploads.",
+    )
+    parser.add_argument(
+        "--retry-failed-uploads-file",
+        metavar="FILE",
+        help="Only retry failed uploads for one source file. Use with --retry-failed-uploads.",
+    )
     return parser
 
 
@@ -26,6 +42,9 @@ def configure_logging(debug: bool) -> logging.Logger:
         datefmt="%H:%M:%S",
         force=True,
     )
+    third_party_level = logging.INFO if debug else logging.WARNING
+    logging.getLogger("urllib3").setLevel(third_party_level)
+    logging.getLogger("requests").setLevel(third_party_level)
     return logging.getLogger()
 
 
@@ -69,12 +88,41 @@ def command_loop(manager: RecorderManager, log: logging.Logger) -> None:
 
     log.info("quitting jobs...")
     manager.quit()
+    summary = manager.uploader_queue.summary()
+    if any(summary.values()):
+        log.info(
+            "upload summary: %s succeeded, %s failed, %s old video(s) deleted.",
+            summary["succeeded"],
+            summary["failed"],
+            summary["deleted"],
+        )
     log.info("bye")
 
 
 def main() -> None:
-    config = Config().load_config("config.json")
     args = build_parser().parse_args()
+    if args.retry_failed_uploads:
+        log = configure_logging(False)
+        result = UploadFailureLog().retry_all(
+            target=args.retry_failed_uploads_target,
+            file_path=args.retry_failed_uploads_file,
+        )
+        if result["total"] == 0:
+            log.info("No failed uploads to retry.")
+            return
+
+        log.info(
+            "Retried %s failed upload(s): %s succeeded, %s remaining, %s skipped.",
+            result["retried"],
+            result["succeeded"],
+            result["remaining"],
+            result["skipped"],
+        )
+        return
+    if args.retry_failed_uploads_target or args.retry_failed_uploads_file:
+        raise SystemExit("Use --retry-failed-uploads together with retry filters.")
+
+    config = Config().load_config("config.json")
     log = configure_logging(config.debug)
 
     rooms = resolve_rooms(config, args.room_id, log)

@@ -18,7 +18,9 @@ class RecorderManager:
         self.config = config
         self.api_client = api_client or ShowroomApiClient()
         self.recorder_cls = recorder_cls
-        self.uploader_queue = uploader_queue or UploaderQueue()
+        self.uploader_queue = uploader_queue or UploaderQueue(
+            cleanup_after_hours=getattr(config, "cleanup_uploaded_videos_after_hours", 0)
+        )
         self.biliup_set = set(config.biliup.rooms)
 
     def start(self):
