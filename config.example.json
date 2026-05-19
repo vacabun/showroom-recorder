@@ -18,5 +18,11 @@
         ],
         "line": "AUTO"
     },
+    "acfun": {
+        "rooms": [
+            "LOVE_MAIKA_SASAKI"
+        ],
+        "cookie_file": "ac_cookies.json"
+    },
     "cleanup_uploaded_videos_after_hours": 0
 }

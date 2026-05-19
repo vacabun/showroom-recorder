@@ -22,8 +22,9 @@ sudo apt install ffmpeg
 1. 复制 `config.example.json` 为 `config.json`
 2. 把要监听的 SHOWROOM 房间 key 写入 `rooms`
 3. 如果要自动上传到 Bilibili，把房间 key 加到 `biliup.rooms`
-4. 如果要上传到 WebDAV，打开 `webdav.upload` 并填写连接信息
-5. 如果要自动删除旧视频，把 `cleanup_uploaded_videos_after_hours` 设成正整数，例如 `48`
+4. 如果要自动上传到 AcFun，把房间 key 加到 `acfun.rooms`，并准备好 `ac_cookies.json`
+5. 如果要上传到 WebDAV，打开 `webdav.upload` 并填写连接信息
+6. 如果要自动删除旧视频，把 `cleanup_uploaded_videos_after_hours` 设成正整数，例如 `48`
 
 showroom 直播地址格式如下：
 
@@ -34,6 +35,7 @@ https://www.showroom-live.com/ROOM_URL_KEY
 把最后一段 `ROOM_URL_KEY` 填到 `rooms` 里即可。
 
 如果需要自动上传到 Bilibili，请把 `cookies.json` 放到运行目录，并在 `biliup.rooms` 中列出需要自动投稿的房间。
+如果需要自动上传到 AcFun，请把 Cookie 文件放到运行目录，或在 `acfun.cookie_file` 中填写自定义路径。程序会根据文件内容自动判断是 JSON Cookies 还是 Netscape Cookie File。
 
 最小配置示例：
 
@@ -46,6 +48,10 @@ https://www.showroom-live.com/ROOM_URL_KEY
     "biliup": {
         "rooms": ["LOVE_MAIKA_SASAKI"],
         "line": "AUTO"
+    },
+    "acfun": {
+        "rooms": ["LOVE_MAIKA_SASAKI"],
+        "cookie_file": "ac_cookies.json"
     },
     "webdav": {
         "upload": false,
@@ -89,6 +95,7 @@ showroom-recorder --retry-failed-uploads
 只补传某一个目标：
 
 ```bash
+showroom-recorder --retry-failed-uploads --retry-failed-uploads-target acfun
 showroom-recorder --retry-failed-uploads --retry-failed-uploads-target bilibili
 showroom-recorder --retry-failed-uploads --retry-failed-uploads-target webdav
 ```

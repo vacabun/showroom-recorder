@@ -1,6 +1,14 @@
 from .recording import Recorder
 from .showroom_api import ShowroomApiClient
-from .uploading import UploadFailureLog, UploadSuccessLog, UploadTask, UploaderBili, UploaderQueue, UploaderWebDav
+from .uploading import (
+    UploadFailureLog,
+    UploadSuccessLog,
+    UploadTask,
+    UploaderAcfun,
+    UploaderBili,
+    UploaderQueue,
+    UploaderWebDav,
+)
 
 __all__ = [
     "Recorder",
@@ -8,6 +16,7 @@ __all__ = [
     "UploadFailureLog",
     "UploadSuccessLog",
     "UploadTask",
+    "UploaderAcfun",
     "UploaderBili",
     "UploaderQueue",
     "UploaderWebDav",

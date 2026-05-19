@@ -24,7 +24,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--retry-failed-uploads-target",
-        choices=["bilibili", "webdav"],
+        choices=["acfun", "bilibili", "webdav"],
         help="Only retry failed uploads for one target. Use with --retry-failed-uploads.",
     )
     parser.add_argument(

@@ -5,7 +5,7 @@ import threading
 
 from ..services.recording import Recorder
 from ..services.showroom_api import ShowroomApiClient
-from ..services.uploading import UploaderBili, UploaderQueue, UploaderWebDav
+from ..services.uploading import UploaderAcfun, UploaderBili, UploaderQueue, UploaderWebDav
 
 
 class RecorderManager:
@@ -22,6 +22,7 @@ class RecorderManager:
             cleanup_after_hours=getattr(config, "cleanup_uploaded_videos_after_hours", 0)
         )
         self.biliup_set = set(config.biliup.rooms)
+        self.acfun_set = set(config.acfun.rooms)
 
     def start(self):
         if self.recorder_thread and self.recorder_thread.is_alive():
@@ -93,6 +94,8 @@ class RecorderManager:
                     )
                     if room_url_key in self.biliup_set:
                         recorder.enable_uploader_bili()
+                    if room_url_key in self.acfun_set:
+                        recorder.enable_uploader_acfun()
                     recorder.start()
                     self.recorders[room_url_key] = recorder
                 except Exception as exc:
@@ -158,6 +161,7 @@ __all__ = [
     "Recorder",
     "RecorderManager",
     "RecroderManager",
+    "UploaderAcfun",
     "UploaderBili",
     "UploaderQueue",
     "UploaderWebDav",

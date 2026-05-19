@@ -1,3 +1,3 @@
-from ..services.uploading import UploaderBili, UploaderQueue, UploaderWebDav
+from ..services.uploading import UploaderAcfun, UploaderBili, UploaderQueue, UploaderWebDav
 
-__all__ = ["UploaderBili", "UploaderQueue", "UploaderWebDav"]
+__all__ = ["UploaderAcfun", "UploaderBili", "UploaderQueue", "UploaderWebDav"]

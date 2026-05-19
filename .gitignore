@@ -24,3 +24,4 @@ config.json
 upload_failures.jsonl
 upload_successes.jsonl
 bili.cookie
+ac_cookies.txt

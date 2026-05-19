@@ -7,7 +7,7 @@ import threading
 import ffmpeg
 
 from .showroom_api import ShowroomApiClient
-from .uploading import UploaderBili, UploaderWebDav
+from .uploading import UploaderAcfun, UploaderBili, UploaderWebDav
 
 
 class Recorder:
@@ -25,6 +25,7 @@ class Recorder:
         self.ffmpeg_proc = None
         self.output = ""
         self.upload_to_bilibili = False
+        self.upload_to_acfun = False
         self.time_str = ""
 
     def start(self):
@@ -53,6 +54,9 @@ class Recorder:
 
     def enable_uploader_bili(self):
         self.upload_to_bilibili = True
+
+    def enable_uploader_acfun(self):
+        self.upload_to_acfun = True
 
     def record(self):
         self.is_recording = True
@@ -110,6 +114,8 @@ class Recorder:
         expected_targets = []
         if self.upload_to_bilibili:
             expected_targets.append("bilibili")
+        if self.upload_to_acfun:
+            expected_targets.append("acfun")
         if self.config.webdav.upload:
             expected_targets.append("webdav")
 
@@ -121,6 +127,18 @@ class Recorder:
                     room_name=self.room_name,
                     time_str=self.time_str,
                     lines=self.config.biliup.line,
+                    expected_targets=expected_targets,
+                )
+            )
+
+        if self.upload_to_acfun:
+            self.uploader_queue.put(
+                UploaderAcfun(
+                    file_path=self.output,
+                    room_url_key=self.room_url_key,
+                    room_name=self.room_name,
+                    time_str=self.time_str,
+                    cookie_file=self.config.acfun.cookie_file,
                     expected_targets=expected_targets,
                 )
             )

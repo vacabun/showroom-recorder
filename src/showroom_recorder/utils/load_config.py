@@ -23,6 +23,10 @@ CONFIG_TEMPLATE = {
         "rooms": [""],
         "line": "AUTO",
     },
+    "acfun": {
+        "rooms": [""],
+        "cookie_file": "ac_cookies.json",
+    },
     "cleanup_uploaded_videos_after_hours": 0,
 }
 
@@ -68,12 +72,27 @@ class BiliupConfig:
 
 
 @dataclass
+class AcfunConfig:
+    rooms: list[str] = field(default_factory=list)
+    cookie_file: str = "ac_cookies.json"
+
+    @classmethod
+    def from_mapping(cls, payload: dict[str, Any] | None) -> "AcfunConfig":
+        payload = payload or {}
+        return cls(
+            rooms=_normalize_room_list(payload.get("rooms")),
+            cookie_file=str(payload.get("cookie_file", "ac_cookies.json") or "ac_cookies.json"),
+        )
+
+
+@dataclass
 class Config:
     interval: int = 10
     debug: bool = False
     webdav: WebdavConfig = field(default_factory=WebdavConfig)
     rooms: list[str] = field(default_factory=list)
     biliup: BiliupConfig = field(default_factory=BiliupConfig)
+    acfun: AcfunConfig = field(default_factory=AcfunConfig)
     best_quality: bool = True
     cleanup_uploaded_videos_after_hours: int = 0
 
@@ -85,6 +104,7 @@ class Config:
             webdav=WebdavConfig.from_mapping(payload.get("webdav")),
             rooms=_normalize_room_list(payload.get("rooms")),
             biliup=BiliupConfig.from_mapping(payload.get("biliup")),
+            acfun=AcfunConfig.from_mapping(payload.get("acfun")),
             best_quality=bool(payload.get("best_quality", True)),
             cleanup_uploaded_videos_after_hours=max(
                 0, int(payload.get("cleanup_uploaded_videos_after_hours", 0))
@@ -104,6 +124,7 @@ class Config:
         self.webdav = loaded.webdav
         self.rooms = loaded.rooms
         self.biliup = loaded.biliup
+        self.acfun = loaded.acfun
         self.best_quality = loaded.best_quality
         self.cleanup_uploaded_videos_after_hours = loaded.cleanup_uploaded_videos_after_hours
         return self

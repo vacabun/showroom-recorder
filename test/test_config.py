@@ -21,6 +21,10 @@ def test_load_config_applies_defaults_and_filters_empty_rooms(tmp_path, monkeypa
                 "biliup": {
                     "rooms": [" bili_room ", ""],
                 },
+                "acfun": {
+                    "rooms": [" ac_room ", ""],
+                    "cookie_file": "cookies/acfun.json",
+                },
                 "cleanup_uploaded_videos_after_hours": 48,
             }
         ),
@@ -38,6 +42,8 @@ def test_load_config_applies_defaults_and_filters_empty_rooms(tmp_path, monkeypa
     assert config.webdav.delete_source_file is False
     assert config.biliup.rooms == ["bili_room"]
     assert config.biliup.line == "AUTO"
+    assert config.acfun.rooms == ["ac_room"]
+    assert config.acfun.cookie_file == "cookies/acfun.json"
     assert config.cleanup_uploaded_videos_after_hours == 48
 
 
@@ -50,4 +56,6 @@ def test_load_config_creates_default_file_when_missing(tmp_path, monkeypatch):
     assert config.interval == 10
     assert config.rooms == []
     assert config.biliup.rooms == []
+    assert config.acfun.rooms == []
+    assert config.acfun.cookie_file == "ac_cookies.json"
     assert config.cleanup_uploaded_videos_after_hours == 0

@@ -29,8 +29,9 @@ Typical setup:
 1. Copy `config.example.json` to `config.json`.
 2. Put the SHOWROOM room URL keys you want to monitor into `rooms`.
 3. If you want Bilibili uploads, add the room keys to `biliup.rooms`.
-4. If you want WebDAV uploads, enable `webdav.upload` and fill in the connection settings.
-5. If you want old uploaded videos to be cleaned up automatically, set `cleanup_uploaded_videos_after_hours` to a positive number such as `48`.
+4. If you want AcFun uploads, add the room keys to `acfun.rooms` and prepare `ac_cookies.json`.
+5. If you want WebDAV uploads, enable `webdav.upload` and fill in the connection settings.
+6. If you want old uploaded videos to be cleaned up automatically, set `cleanup_uploaded_videos_after_hours` to a positive number such as `48`.
 
 The SHOWROOM live URL format is:
 
@@ -41,6 +42,7 @@ https://www.showroom-live.com/ROOM_URL_KEY
 Use the last path segment as the room key.
 
 For Bilibili uploads, place your exported `cookies.json` next to `config.json`. Sensitive tokens and cookies should stay in local files, not in Git.
+For AcFun uploads, place your exported cookie file next to `config.json` unless you override `acfun.cookie_file`. The loader detects JSON cookies and Netscape cookie files automatically from the file contents.
 
 Minimal example:
 
@@ -53,6 +55,10 @@ Minimal example:
     "biliup": {
         "rooms": ["LOVE_MAIKA_SASAKI"],
         "line": "AUTO"
+    },
+    "acfun": {
+        "rooms": ["LOVE_MAIKA_SASAKI"],
+        "cookie_file": "ac_cookies.json"
     },
     "webdav": {
         "upload": false,
@@ -103,6 +109,7 @@ showroom-recorder --retry-failed-uploads
 Retry only one target:
 
 ```bash
+showroom-recorder --retry-failed-uploads --retry-failed-uploads-target acfun
 showroom-recorder --retry-failed-uploads --retry-failed-uploads-target bilibili
 showroom-recorder --retry-failed-uploads --retry-failed-uploads-target webdav
 ```
