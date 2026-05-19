@@ -39,6 +39,15 @@ def compact_text(text, max_len):
     return text[: max_len - 3] + "..."
 
 
+def format_bytes(num_bytes):
+    value = float(num_bytes)
+    for unit in ("B", "KB", "MB", "GB", "TB"):
+        if value < 1024 or unit == "TB":
+            return f"{value:.1f}{unit}"
+        value /= 1024
+    return f"{num_bytes}B"
+
+
 class AcfunUploader:
     def __init__(self, cookie_file="ac_cookies.json"):
         self.cookie_file = cookie_file
@@ -228,6 +237,7 @@ class AcfunUploader:
         return int(payload["videoId"])
 
     def upload_cover(self, image_path):
+        logging.info("AcFun cover upload started: %s", image_path)
         suffix = Path(image_path).suffix.lower()
         if suffix not in {".jpg", ".jpeg", ".png", ".webp"}:
             suffix = ".jpg"
@@ -253,6 +263,7 @@ class AcfunUploader:
         cover_url = payload.get("url") if isinstance(payload, dict) else None
         if not cover_url:
             raise RuntimeError(f"AcFun cover url failed: {payload}")
+        logging.info("AcFun cover upload finished")
         return cover_url
 
     def create_douga(self, file_path, title, channel_id, cover_path, desc="", tags=None, original_url=""):
@@ -261,6 +272,14 @@ class AcfunUploader:
         file_size = os.path.getsize(file_path)
         task_id, upload_token, part_size = self.get_token(file_name, file_size)
         fragment_count = ceil(file_size / part_size)
+        logging.info(
+            "AcFun video upload started: %s (%s, %s chunk%s)",
+            file_name,
+            format_bytes(file_size),
+            fragment_count,
+            "" if fragment_count == 1 else "s",
+        )
+        next_progress_marker = 10
 
         with open(file_path, "rb") as file_obj:
             for fragment_id in range(fragment_count):
@@ -268,10 +287,22 @@ class AcfunUploader:
                 if not chunk_data:
                     break
                 self.upload_chunk(chunk_data, fragment_id, upload_token)
+                progress = int(((fragment_id + 1) / fragment_count) * 100)
+                if progress >= next_progress_marker or fragment_id + 1 == fragment_count:
+                    logging.info(
+                        "AcFun video upload progress: %s%% (%s/%s)",
+                        progress,
+                        fragment_id + 1,
+                        fragment_count,
+                    )
+                    while progress >= next_progress_marker:
+                        next_progress_marker += 10
 
+        logging.info("AcFun video upload finishing on server")
         self.complete_upload(fragment_count, upload_token)
         video_id = self.create_video(task_id, file_name)
         cover_url = self.upload_cover(cover_path)
+        logging.info("AcFun submit request started")
         payload = {
             "title": title,
             "description": desc,
@@ -299,6 +330,7 @@ class AcfunUploader:
         response.raise_for_status()
         result = response.json()
         if result.get("result") == 0 and "dougaId" in result:
+            logging.info("AcFun submit succeeded: ac%s", result["dougaId"])
             return True, {"ac_number": result["dougaId"], "title": title, "cover_url": cover_url}
 
         error_msg = result.get("error_msg") or result.get("msg") or result.get("err_msg") or result
